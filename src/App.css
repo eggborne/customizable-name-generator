@@ -16,7 +16,7 @@ body {
   margin: 0;
   overflow: hidden;
 }
-#view-container {
+#view-container { 
   background: #393020;
   height: 100%;
   display: flex;
@@ -51,33 +51,7 @@ body {
   z-index: 3;
   opacity: 0.95;
 }
-button {
-  font-family: 'Bungee';
-  border-radius: 0.75rem;
-  font-size: 1.2rem;
-  background-color: rgb(49, 155, 49);
-  border: 0.25rem solid rgb(7, 46, 7);
-  padding: 15%;
-  color: white;
-  line-height: 100%;
-  cursor: pointer;
-  outline: none;
-  animation-duration: 210ms;
-  animation-iteration-count: infinite;
-  transition: border-color 105ms ease, background-color 105ms ease;
-}
-button.busy {
-  border-color: pink !important;
-  animation-name: busy-button;
-}
-@keyframes busy-button {
-  0% {
-    border-color: white;
-  }
-  100% {
-    border-color: red;
-  }
-}
+
 .feedback-select-toggle:hover, #dirty-toggle:hover, #bulk-toggle:hover, button:hover {
   border-color: white;
 }
@@ -101,26 +75,6 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
-}
-.mode-toggle-button {
-  width: 44%;
-  background-color: rgb(104, 74, 74);
-  border-radius: 1vmin;
-  padding: 1vh;
-  margin-top: 1vh;
-  margin-bottom: 1vh;
-  border: 2px solid rgb(126, 84, 84);;  
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  text-align: center;
-  font-size: 0.7rem;
-  transition: border-color 105ms ease;
-}
-.mode-toggle-button.on {
-  background-color: rgb(83, 114, 85);
-  border-color: red;  
 }
 #lower-button-area {
   width: 71%;
@@ -186,26 +140,6 @@ h2 {
   margin: 2vmin;
   color: #aaa;
 }
-.style-button {
-  font-family: 'Nova Square';
-  width: 100%;
-  padding: 1.25vh;
-  padding-top: 1.75vh;
-  padding-bottom: 1.75vh;
-  background-color: #222;
-  border-radius: 0.5rem;
-  transition: background-color 210ms ease;
-  border-width: 3px;
-  font-size: 0.8rem;
-}
-#random-button {
-  grid-column-start: 0;
-  grid-column-end: span 3;
-}
-.style-button.selected {
-  background-color: #666;
-}
-
 #history-shade {
   position: fixed;
   width: 100vw;

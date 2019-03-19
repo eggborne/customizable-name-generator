@@ -10,8 +10,6 @@
   text-align: center;
   width: 90vw;
   font-size: 2rem;
-  opacity: 0;
-  transform: translateY(-5%);
   transition: all var(--swap-speed) ease;
 }
 #name-stats {
