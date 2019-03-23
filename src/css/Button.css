@@ -1,0 +1,120 @@
+button {
+  font-family: 'Bungee';
+  border-radius: 0.5rem;
+  font-size: var(--base-font-size);
+  background-color: rgb(38, 100, 38);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.25));
+  border: 0.25rem solid rgb(7, 46, 7);
+  color: white;
+  line-height: 100%;
+  cursor: pointer;
+  animation-duration: 210ms;
+  animation-iteration-count: infinite;
+}
+button:disabled {
+  background-color: gray !important;
+  border-color: #333;
+  color: #ccc;
+  opacity: 0.8;
+}
+button.busy {
+  border-color: pink !important;
+  animation-name: busy-button;
+}
+button.bottom-nav {
+  height: 8vh;
+  padding: 0;
+  font-size: var(--nav-font-size);
+  width: 28vw;
+}
+.back-button {
+  width: 28vw;
+}
+.style-toggle-button {
+  font-family: 'Nova Square';
+  width: 100%;
+  padding: 0;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  background-color: rgb(82, 75, 75);
+  border-radius: 0.25rem;
+  transition: background-color 210ms ease;
+  border: 0.1rem solid rgb(102, 83, 83);
+  font-size: var(--medium-font-size);
+}
+.style-toggle-button.selected {
+  background-color: rgb(83, 114, 85);
+  border-color: white;  
+}
+#random-button {
+  padding-top:1vh;
+  padding-bottom:1vh;
+  align-self: stretch;
+  grid-column-start: 0;
+  grid-column-end: span 3;
+}
+.mode-toggle-button {
+  background-image: none;
+  border-radius: 0.2rem;
+  font-family: 'Nova Square';
+  background-color: rgb(104, 74, 74);
+  padding-top: 1.25vh;
+  padding-bottom: 1.25vh;
+  padding-left: 5%;
+  padding-right: var(--small-font-size);
+  border: 0.1rem solid rgb(126, 84, 84);;  
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--small-font-size);
+  transition: border 105ms ease;
+  cursor: pointer;
+}
+.mode-toggle-button.selected {
+  background-color: rgb(83, 114, 85);
+  border-color: white;  
+}
+.mode-toggle-button:after {
+  content: ' OFF';
+  white-space: pre;
+}
+.mode-toggle-button.selected:after {
+  content: ' ON';
+  white-space: pre;
+}
+button.bottom-nav:active, .rule-edit-button:active, #main-button:active, #history-button:active, #rules-button:active {
+  border-color: rgb(94, 131, 83);
+}
+#main-button {
+  border-width: 0.75vh;
+  background-color: green;
+  width: 100%;
+  /* font-size: var(--base-font-size); */
+}
+#history-button, #rules-button {
+  padding: 0;
+  font-size: var(--large-font-size);
+  background-color: rgb(36, 90, 36);
+  height: 100%;
+  width: 34vw;
+}
+#submit-feedback-button, #close-feedback-button {
+  font-size: var(--small-font-size);
+  padding: 0;
+  width: 35%;
+}
+#submit-feedback-button {
+  width: 48%;
+}
+#submit-feedback-button:disabled {
+  color: gray;
+  background-color: #444;
+}
+
+@keyframes busy-button {
+  0% {
+    border-color: white;
+  }
+  100% {
+    border-color: red;
+  }
+}

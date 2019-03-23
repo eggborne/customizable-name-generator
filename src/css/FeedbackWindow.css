@@ -1,0 +1,95 @@
+#feedback-panel {
+  position: fixed;
+  height: 100%;
+  border-radius: 0.25rem;
+  width: 100%;
+  background-color: #292020;
+  box-shadow: 0px 0px 1.5rem 0px black;
+  transform: scaleX(0.95);
+  display: grid;
+  align-items: stretch;
+  grid-template-columns: auto;
+  grid-template-rows: 15% 17% 53% 15%; 
+  transition: transform 210ms ease, opacity 210ms ease;
+  z-index: 3;
+}
+#feedback-panel.hidden {
+  transform: translateY(-10%);
+  opacity: 0;
+  pointer-events: none
+}
+.name-letter:hover {
+  color: rgb(226, 178, 178);
+}
+#feedback-info-message {
+  text-align: center;
+  font-size: var(--small-font-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  background-color: black;
+  z-index: 4;
+  height: 100%;
+}
+#feedback-title {
+  font-family: 'Bungee';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  line-height: 100%;
+  font-size: var(--name-font-size);
+  /* line-height: 100%; */
+}
+#feedback-selected-display {
+  font-size: var(--name-font-size);
+  display: flex;
+  /* display: none; */
+  align-items: flex-start;
+  justify-content: center;
+}
+#feedback-button-area {
+  display: grid;
+  grid-template-columns: auto; 
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  align-items: stretch;
+  justify-items: center;
+  grid-row-gap: 1vh;
+}
+.feedback-select-toggle {
+  font-size: var(--nav-font-size);
+  font-family: 'Nova Square';
+  background: #333;
+  border-radius: 0.25rem;
+  width: 90%;
+  display: flex;
+  align-items: center;
+  padding: 3vw;
+  border: 0.25vh solid rgb(10, 53, 10);
+  cursor: pointer;
+  transition: border-color 105ms ease, background-color 105ms ease;
+}
+.feedback-select-toggle.disabled {
+  background-color: rgb(51, 51, 51, 0.5);
+  color: gray;
+  border-color: transparent;
+  pointer-events: none;
+}
+.feedback-select-toggle.selected {
+  background-color: green !important;
+  color: #dedede;
+  border-color: white;
+}
+#feedback-footer {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: stretch;
+  padding: 2vh;
+  padding-left: 2vw;
+  padding-right: 2vw;
+}
+#feedback-footer button {
+  font-size: var(--nav-font-size);
+}

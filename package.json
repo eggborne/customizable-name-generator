@@ -1,6 +1,6 @@
 {
   "name": "name-generator",
-  "homepage": ".",
+  "homepage": "https://www.eggborne.com/namegenerator/",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -8,6 +8,8 @@
     "@types/node": "^11.11.3",
     "@types/react": "^16.8.8",
     "@types/react-dom": "^16.8.2",
+    "axios": "^0.18.0",
+    "prop-types": "^15.7.2",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
     "react-router-dom": "^5.0.0",

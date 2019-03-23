@@ -1,0 +1,27 @@
+#name-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--name-display-height);
+  flex-grow: 0.4;
+}
+#name-display {
+  text-align: center;
+  width: 90vw;
+  opacity: 0;
+  transition: transform var(--swap-speed) ease, opacity calc(var(--swap-speed) * 2) ease-out;
+}
+#name-display.not-showing {
+  display: none;
+}
+#name-stats {
+  position: absolute;
+  transform: scale(0.95);
+  font-size: var(--small-font-size);
+  color: #888;
+  transition: all 210ms ease;
+}
+#name-display.quick {
+  transition-duration: 0ms;
+}
