@@ -28,7 +28,7 @@ function getRules(creator) {
       'Content-type': 'application/x-www-form-urlencoded'
     },
     params: {
-      dialect: 'starWars',
+      dialect: 'Star Wars',
       creator: creator
     }
   });
@@ -40,6 +40,46 @@ function getAllRulesets() {
     url: `${ROOT}/getrulesets.php`,
     headers: {
       'Content-type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
+
+function sendNewRules(rulesObj) {
+  console.log('got',rulesObj)
+  let changedRules = rulesObj.changed;
+  for (let listType in rulesObj) {
+    if (rulesObj[listType].map) {
+      rulesObj[listType].map((str, i) => {
+        if (str.includes && str.includes('q\'')) {
+          rulesObj[listType][i] = str.replace('q\'', 'qapos');
+        }
+      });
+    }
+  };
+  let lastRulesID = undefined;
+  if (rulesObj.usingRuleset.includes('custom') && !rulesObj.usingRuleset.includes('mike')) {
+    lastRulesID = rulesObj.usingRuleset;
+  }
+  let creatorName = rulesObj.rulesetSelected;
+  console.info('RULES ----------------------', rulesObj);
+  console.warn('sending new id', creatorName, 'and deleting', lastRulesID)
+  return axios({
+    method: 'post',
+    url: `${ROOT}/sendnewrules.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    params: {
+      lastRulesID: lastRulesID,
+      creator: creatorName,
+      changed: JSON.stringify(changedRules),
+      dialect: 'Star Wars',
+      banned: JSON.stringify(rulesObj.banned),
+      universal: JSON.stringify(rulesObj.universal),
+      startWord: JSON.stringify(rulesObj.startWord),
+      midWord: JSON.stringify(rulesObj.midWord),
+      endWord: JSON.stringify(rulesObj.endWord),
+      loneWord: JSON.stringify(rulesObj.loneWord),
     }
   });
 }
@@ -118,16 +158,16 @@ class App extends Component {
       lastUpdated: 0,
       hasNewRules: true,
       feedbackMode: false,
-      nameEditing: 'Cock Johnson'
+      nameEditing: 'Cock Johnson',
+      statusText: 'Loading ruleset...'
     }
     this.generator = new NameGenerator();
     console.error('GENERATOR created.')
-  }
-  componentDidMount() {   
-    console.warn(window.location.pathname)
+  }  
+  componentDidMount() {
     if (PROD && (window.location.pathname.includes('history') || window.location.pathname.includes('rules'))) {
       window.location.pathname = '/namegenerator/';
-    }
+    }    
     let startRules = window.performance.now();
     console.log('took to mount:', startRules - intitialLoad);
     console.error('APP MOUNTED');
@@ -147,14 +187,17 @@ class App extends Component {
         let newRuleData = { ...this.state.ruleData };
         newRuleData.rulesets = response.data;
         this.setState({
+          statusText: `Using ruleset '${newRuleData.dialect}' by ${newRuleData.creator.split('-')[0]}`,
           ruleData: newRuleData,
           lastUpdated: Date.now(),
         });
       });
     });
   }
+
   handleClickGenerate = (event) => {
-    let rulesToSend;
+    // this.bounceButton(event);
+    let rulesToSend;    
     if (this.state.hasNewRules) {
       rulesToSend = this.state.ruleData;
       this.setState({
@@ -167,22 +210,31 @@ class App extends Component {
     }
     if (this.state.dirtyMode) {
       let dirtyNameData;
-      while (!dirtyNameData) {
-        let newName = this.generator.getName(rulesToSend, this.state.currentNameStyle, currentSpecial);
+      console.log(this.state.productionData.calledThisRun, 'called');
+      let tries = 0;
+      while (!dirtyNameData && tries < 100) {
+        let newName = this.generator.getName(false, this.state.currentNameStyle, currentSpecial);
+        tries++;
         if (newName && newName.banned) {
           dirtyNameData = newName;
         }
       }
-      let newProductionData = { ...this.state.productionData };
-      newProductionData.namesList.push(dirtyNameData);
-      this.setState({
-        productionData: newProductionData
-      });
+      if (dirtyNameData) {
+        let newProductionData = { ...this.state.productionData };
+        newProductionData.namesList.push(dirtyNameData);
+        this.setState({
+          productionData: newProductionData
+        });
+      } else {
+        this.setState({
+          statusText: 'Too many tries.'
+        });
+      }
     } else if (this.state.bulkMode) {
       for (let i = 0; i < this.state.bulkAmount; i++) {
         setTimeout(() => {
           this.displayNewName();
-        }, (i * 60));
+        }, (i * 20));
       }
     } else {
       this.displayNewName();
@@ -198,7 +250,7 @@ class App extends Component {
     if (this.state.hasNewRules) {
       rulesToSend = this.state.ruleData;
       this.setState({
-        hasRules: false
+        hasNewRules: false
       });
     }
     if (this.state.simpleMode) {
@@ -238,11 +290,13 @@ class App extends Component {
       if (newProductionData.calledThisRun > 1) {
         addendum = ` (${newProductionData.calledThisRun} tries)`;
       }
-      document.getElementById('tally-text').innerHTML = `got ${newNameData.fullName} in ${(window.performance.now() - startTime).toPrecision(3)}ms${addendum}`;
+      
+      // document.getElementById('tally-text').innerHTML = `got ${newNameData.fullName} in ${(window.performance.now() - startTime).toPrecision(3)}ms${addendum}`;
       newProductionData.namesList.push(newNameData);
       newProductionData.calledThisRun = 0;
       newProductionData.displayedThisRun = 0;
       this.setState({
+        statusText: `got ${newNameData.fullName} (${newNameData.style}) in ${(window.performance.now() - startTime).toPrecision(3)}ms${addendum}`,
         productionData: newProductionData
       });
     }    
@@ -378,7 +432,7 @@ class App extends Component {
   }
   handleClickChangeRuleset = (event) => {
     console.log('get those rulesets')
-    if ((Date.now() - this.state.lastUpdated > 10000)) {
+    if ((Date.now() - this.state.lastUpdated > 500)) {
       getAllRulesets().then(response => {
         console.log('got those rulesets', response)
         response.data.map(ruleset => {
@@ -418,7 +472,7 @@ class App extends Component {
     }
   }
   handleChooseNewRuleset = () => {
-    let newRuleData = { ...this.state.ruleData };
+    let newRuleData = { ...this.state.ruleData };   
     newRuleData.usingRuleset = newRuleData.rulesetSelected;
     console.log('new rules?', newRuleData)
     this.setState({
@@ -449,7 +503,26 @@ class App extends Component {
 
   handleClickFeedback = (event) => {
     console.log(event.target);
+    
+  }
 
+  handleClickEdit = (event) => {
+    // testing sendNewRules!
+    console.log(event.target);
+    let newRuleData = { ...this.state.ruleData };
+    let creatorName = `custom-${Date.now()}`;
+    newRuleData.rulesetSelected = creatorName;
+    console.warn('sending', newRuleData.rulesetSelected, 'rules. last:', newRuleData.creator);
+    sendNewRules(newRuleData).then((response) => {
+      let newRuleData = { ...this.state.ruleData };
+      console.log('sendNewRules got', response);
+      newRuleData.rulesetSelected = creatorName;
+      newRuleData.usingRuleset = creatorName;
+      newRuleData.creator = creatorName;
+      this.setState({
+        ruleData: newRuleData
+      });
+    });
   }
   // selectFeedback = (event, type) => {
   //   if (feedbackTypesSelected.indexOf(type) === -1) {
@@ -487,13 +560,12 @@ class App extends Component {
             <>
               {this.state.dataReady &&
                 <>
-                  <RulesScreen location={location} onClickChangeRuleset={this.handleClickChangeRuleset} onClickBack={this.handleClickBack} ruleData={ruleData} />
+                <RulesScreen location={location} onClickEdit={this.handleClickEdit} onClickChangeRuleset={this.handleClickChangeRuleset} onClickBack={this.handleClickBack} ruleData={ruleData} />
                   <HistoryScreen location={location} onClickName={this.handleClickName} namesList={this.state.productionData.namesList} onClickBack={this.handleClickBack} onClickGenerateMore={this.handleClickGenerate} onclickClearList={this.handleClearList} />
                   <Route path="/rules" render={() =>
                     <RulesetSelect location={location} onChooseNewRuleset={this.handleChooseNewRuleset} onSelectRuleset={this.handleSelectRuleset} onDismissRulesetSelect={this.handleDismissRulesetSelect} ruleData={this.state.ruleData} />
                   } />
                 <FeedbackWindow showing={this.state.feedbackMode} location={location} onClickFeedback={this.handleClickFeedback} onClickBack={this.handleClickBack} ruleData={this.state.ruleData} nameData={this.state.nameEditing} />
-                  
                 </>
               }
             <NameDisplay location={location} onClickName={this.handleClickName} nameData={featuredName} bulkMode={this.state.bulkMode} />
@@ -501,7 +573,7 @@ class App extends Component {
           </>
       } />
       </Router>
-      <TitleBar titleText={'Name Generator'} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />          
+      <TitleBar titleText={'Name Generator'} statusText={this.state.statusText} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />          
     </div>
     );
   }
