@@ -8,10 +8,10 @@ function TitleBar(props) {
       <div id='title-area'>
         <div id='title-text'>{props.titleText}</div>
         {/* <div id='tally-text'>total names generated: {props.totalCalls} ({percentUnique}% unique)</div> */}
-        <div id='tally-text'>Loading ruleset...</div>
+        <div id='tally-text'>{props.statusText}</div>
       </div>
       <i id='mail-icon' className='material-icons'>mail</i>
-      <img id='github-icon' src='githubicon.png' alt='View on GitHub'></img>
+      <img id='github-icon' src={`https://eggborne.com/namegenerator/githubicon.png`} alt='View on GitHub'></img>
     </div>
   );
 }

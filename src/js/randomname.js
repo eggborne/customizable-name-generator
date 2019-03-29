@@ -1,4 +1,147 @@
 function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; };
+const defaultLengthRange = {
+  min: 1,
+  max: 5 // unlimited
+};
+export const namePatterns = {
+  'yoda': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+    ],
+  },
+  'han': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange:  { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'repeater', value: 1, lengthRange: { min: 1, max: 1 } },
+    ],
+  },
+  'mace': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+  },
+  'poe': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 2 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+  },
+  'kylo': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+    ],
+  },
+  'jar-jar': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange:  { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'literal', value: ' ', lengthRange: defaultLengthRange },
+      { type: 'repeater', value: 0, lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 1, lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 2, lengthRange: defaultLengthRange },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      { type: 'literal', value: 's', lengthRange: { min: 1, max: 1 } },
+      // { type: 'vowelUnits', lengthRange: defaultLengthRange },
+    ],
+  },
+  'jabba': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      // { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
+      { type: 'literal', value: ' ', lengthRange: { min: 1, max: 1 } },
+      { type: 'literal', value: 't', lengthRange: { min: 1, max: 1 } },
+      { type: 'literal', value: 'h', lengthRange: { min: 1, max: 1 } },
+      { type: 'literal', value: 'e', lengthRange: { min: 1, max: 1 } },
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
+    ],
+  },
+  'obi-wan': {
+    firstName: [
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'literal', value: '-', lengthRange: defaultLengthRange },
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: defaultLengthRange },
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } }
+    ],
+  },
+  'qui-gon': {
+    firstName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'literal', value: '-', lengthRange: defaultLengthRange },
+      { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 2, max: 2 } },          
+    ],
+    lastName: [
+      { type: 'consonantStarters', lengthRange: defaultLengthRange },
+      { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 2, max: 2 } },
+    ],
+  }
+}
 
 export default class NameGenerator {
   constructor() {    
@@ -55,149 +198,9 @@ export default class NameGenerator {
       'Padme Amidala',
       'Kylo Ren',
     ];
-    this.defaultLengthRange = {
-      min: 1,
-      max: 5 // unlimited
-    };
-    this.namePatterns = {
-      'yoda': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-        ],
-      },
-      'han': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange:  { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'repeater', value: 1, lengthRange: { min: 1, max: 1 } },
-        ],
-      },
-      'mace': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-      },
-      'poe': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          // { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-      },
-      'kylo': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-        ],
-      },
-      'jar-jar': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange:  { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'literal', value: ' ', lengthRange: this.defaultLengthRange },
-          { type: 'repeater', value: 0, lengthRange: { min: 1, max: 1 } },
-          { type: 'repeater', value: 1, lengthRange: { min: 1, max: 1 } },
-          { type: 'repeater', value: 2, lengthRange: this.defaultLengthRange },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: this.defaultLengthRange },
-          { type: 'literal', value: 's', lengthRange: { min: 1, max: 1 } },
-          // { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-        ],
-      },
-      'jabba': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-          // { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
-          { type: 'literal', value: ' ', lengthRange: { min: 1, max: 1 } },
-          { type: 'literal', value: 't', lengthRange: { min: 1, max: 1 } },
-          { type: 'literal', value: 'h', lengthRange: { min: 1, max: 1 } },
-          { type: 'literal', value: 'e', lengthRange: { min: 1, max: 1 } },
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-          { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
-        ],
-      },
-      'obi-wan': {
-        firstName: [
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'literal', value: '-', lengthRange: this.defaultLengthRange },
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: this.defaultLengthRange },
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } }
-        ],
-      },
-      'qui-gon': {
-        firstName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'literal', value: '-', lengthRange: this.defaultLengthRange },
-          { type: 'consonantStarters', lengthRange: { min: 1, max: 1 } },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 2, max: 2 } },          
-        ],
-        lastName: [
-          { type: 'consonantStarters', lengthRange: this.defaultLengthRange },
-          { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-          { type: 'consonantEnders', lengthRange: { min: 2, max: 2 } },
-        ],
-      }
-    }
+    this.defaultLengthRange = defaultLengthRange;
+
+    this.namePatterns = namePatterns;
     this.cachedRules = undefined;
 
     this.produceName = (pattern) => {
@@ -224,6 +227,7 @@ export default class NameGenerator {
           } else if (unit.type === 'repeater') {
             newPiece = nameData.wordUnits[wordType][unit.value];
           } else {
+            console.log('making fioterArray for type', unit.type)
             let filterArray = this.cachedRules[unit.type];
             if (unit.exclude) {
               filterArray = filterArray.filter(wordUnit => !unit.exclude.includes(wordUnit[0]));
@@ -232,9 +236,8 @@ export default class NameGenerator {
               filterArray = filterArray.filter(wordUnit => wordUnit.length >= unit.lengthRange.min && wordUnit.length <= unit.lengthRange.max);
               // console.error('lengthRange now filterArray', unit.lengthRange.min, 'to', unit.lengthRange.max, filterArray)
             }
-            if (i > 0) {
-              let lastPiece = nameData.wordUnits[wordType][i - 1];
-              // console.log('last piece is', lastPiece)
+            let lastPiece = nameData.wordUnits[wordType][i - 1];
+            if (i > 0 && lastPiece !== '-') {
               newPiece = this.produceRandomNextPiece(lastPiece, filterArray);
             } else {
               // first letter
@@ -242,12 +245,14 @@ export default class NameGenerator {
               newPiece = newPiece[0].toUpperCase() + newPiece.slice(1, newPiece.length);
             }
           }
-          if (newPiece.length > unit.lengthRange.max) {
-            console.warn(newPiece, 'longer than', unit.lengthRange.max, 'at point', nameData.wordUnits[wordType], '. Truncating.');
-          }
-          if (newPiece.length < unit.lengthRange.min) {
-            console.warn(newPiece, 'shorter than', unit.lengthRange.min, 'at point', nameData.wordUnits[wordType]);
-          }
+          // if (newPiece) {
+          //   if (newPiece.length > unit.lengthRange.max) {
+          //     console.warn(newPiece, 'longer than', unit.lengthRange.max, 'at point', nameData.wordUnits[wordType], '. Truncating.');
+          //   }
+          //   if (newPiece.length < unit.lengthRange.min) {
+          //     console.warn(newPiece, 'shorter than', unit.lengthRange.min, 'at point', nameData.wordUnits[wordType]);
+          //   }
+          // }          
           nameData.wordUnits[wordType].push(newPiece);
         });
       }
@@ -278,12 +283,10 @@ export default class NameGenerator {
           
             // console.log('checking',word,'for',invalidString,'using',ruleType)
   
-            if (word.toLowerCase().includes(invalidString)) {
-              console.log(word,'has',invalidString)
-  
+            if (word.indexOf(invalidString) > -1) {  
               let violating;
               let stringIndex = word.indexOf(invalidString);
-              if (ruleType === 'universal') {
+              if (ruleType === 'universal' || ruleType === 'banned') {
                 violating = true;
               } else if (ruleType === 'startWord') {
                 violating = stringIndex === 0;
@@ -294,21 +297,23 @@ export default class NameGenerator {
               } else if (ruleType === 'loneWord') {
                 violating = word === invalidString;
               }
-  
               if (violating) {   
-                console.log(word,'violated',ruleType,violating)
+                // console.log(word,'violated',ruleType,violating)
+                console.warn("VIOLATOR!", word, invalidString, ruleType)
                 if (invalidStrings.banned.indexOf(invalidString) > -1) {
+                  console.error(word, 'is BANNED!')
                   banned = true;
                 } else {
+                  console.error(word, 'is INVALID')
                   invalid = true;
-                  violation = {
-                    rule: ruleType,
-                    invalidString: {
-                      value: invalidString,
-                      index: nameData.fullName.toLowerCase().indexOf(invalidString)
-                    }
-                  };
                 }
+                violation = {
+                  rule: ruleType,
+                  invalidString: {
+                    value: invalidString,
+                    index: nameData.fullName.toLowerCase().indexOf(invalidString)
+                  }
+                };                
                 return {
                   banned: banned,
                   invalid: invalid,
@@ -391,16 +396,17 @@ export default class NameGenerator {
             nameArray[0].split('-')[0],
             nameArray[0].split('-')[1],
             nameArray[1]
-          ];
+          ];          
         }
         nameData.nameArray = nameArray;
         let violationData = this.getViolations(nameData);
         if (violationData.violation) {
-          console.error('violationData', nameData.fullName, violationData);        
+          // console.error('violationData', nameData.fullName, violationData);        
         }
         nameData.banned = violationData.banned;
         nameData.invalid = violationData.invalid;
         nameData.violation = violationData.violation;
+        nameData.style = mode;
         return nameData;
       } else {
         return { fullName: nameData.fullName, redundant: true }

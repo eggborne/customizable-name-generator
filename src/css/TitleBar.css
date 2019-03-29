@@ -3,7 +3,7 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
-  font-family: 'Bungee';
+  font-family: var(--title-font);
   padding: 1vw;
   padding-left: 3vw;
   padding-right: 3vw;
@@ -27,13 +27,13 @@ i {
 }
 #tally-text {
   font-size: var(--medium-font-size);
-  font-family: 'Nova Square';
+  font-family: var(--secondary-font);
   transition: opacity 210ms ease;
 }
 #github-icon {
   opacity: 0.35;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 2.75vh;
+  height: 2.75vh;
   cursor: pointer;
 }
 #mail-icon {

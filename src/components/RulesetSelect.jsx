@@ -6,12 +6,15 @@ import '../css/Button.css';
 import '../css/RulesetSelect.css';
 
 function RulesetSelect(props) {
-  // console.error('rendering RulesetSelect!!')
   let rulesets = props.ruleData.rulesets;
+  // console.error('rendering RulesetSelect!!', props.ruleData.creator, props.ruleData.usingRuleset, props.ruleData.rulesetSelected)
   let readyToChange = props.ruleData.usingRuleset !== props.ruleData.rulesetSelected;
   return (
-    <div className={props.location.location.pathname === '/rules/rulesetselect' ? undefined : 'hidden'} id='ruleset-select-screen'>
-      <div id='ruleset-title'>SELECT RULESET</div>
+
+    <div className={props.location.location.pathname === '/rules/rulesetselect' ? 'shade showing' : 'shade'}>
+
+    <div className={props.location.location.pathname === '/rules/rulesetselect' ? 'floating-window' : 'floating-window hidden'} id='ruleset-select-screen'>
+      <div className='title-header' id='ruleset-title'>SELECT RULESET</div>
       <div id='ruleset-list'>
         {rulesets.length ?
           <>
@@ -21,7 +24,7 @@ function RulesetSelect(props) {
               if (ruleset.creator === props.ruleData.rulesetSelected) {
                 highlighted = ' highlighted';
               }
-              if (ruleset.creator === props.ruleData.usingRuleset) {
+              if (ruleset.creator === props.ruleData.creator) {
                 using = ' using';
               }
               let creatorDisplay = ruleset.creator;
@@ -45,7 +48,8 @@ function RulesetSelect(props) {
               }
               return (
                 <div key={ruleset.index} id={ruleset.creator} onClick={props.onSelectRuleset} className={`ruleset-listing${using}${highlighted}`}>
-                  {creatorDisplay}
+                  {creatorDisplay}<br />
+                  {creatorDisplay.includes('User') && `#${ruleset.creator.split('-')[1]}`}
                   <div className='ruleset-info'>
                     Edits: {ruleset.changed.length}
                   </div>
@@ -55,12 +59,15 @@ function RulesetSelect(props) {
           :
           <div id='loading-message'>loading...</div>
         }
-      </div>
+        </div>
+        
       <div className='lower-nav-panel floating'>
-        <div><Link to='/rules' replace><Button className='bottom-nav nav-link' onClick={props.onDismissRulesetSelect} label={'CANCEL'} type='cancel' /></Link></div>
+        <div><Link to='/rules' replace><Button className='bottom-nav nav-link cancel-button' onClick={props.onDismissRulesetSelect} label={'CANCEL'} /></Link></div>
         <div><Link to='/rules' replace><Button disabled={!readyToChange} className='bottom-nav nav-link' onClick={props.onChooseNewRuleset} label={'CHANGE'} type='choose-ruleset' /></Link></div>
         <div></div>
       </div>
+      </div>
+
     </div>
   );
 }

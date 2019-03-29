@@ -4,16 +4,37 @@
   align-items: center;
   justify-content: center;
   min-height: var(--name-display-height);
-  flex-grow: 0.4;
 }
-#name-display {
-  text-align: center;
+div#name-display {
+  color: white;
+  /* text-align: center; */
   width: 90vw;
-  opacity: 0;
-  transition: transform var(--swap-speed) ease, opacity calc(var(--swap-speed) * 2) ease-out;
+  height: 12vh;
+  min-height: var(--name-display-height);
+  opacity: 0.99;
+  transform: scale(1);
+  /* animation: hide; */
+  /* animation-duration: calc(var(--swap-speed) * 2); */
+  /* animation-iteration-count: infinite; */
+  /* animation-play-state: paused; */
+  /* animation-direction: alternate; */
+  /* animation-iteration-count: 1; */
+  transition: transform var(--swap-speed) ease, opacity var(--swap-speed) ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-#name-display.not-showing {
-  display: none;
+#name-display.hiding {
+  animation-play-state: running;
+  animation-iteration-count: 1;
+}
+#name-display.obscured > #name-text {
+  opacity: 0.5;
+  transform: scaleY(1.75);
+}
+#name-display.not-showing > #name-text {
+  opacity: 0;
+  transform: scaleY(1.75);
 }
 #name-stats {
   position: absolute;
@@ -24,4 +45,26 @@
 }
 #name-display.quick {
   transition-duration: 0ms;
+}#name-text {
+  transition: transform var(--swap-speed) ease, opacity var(--swap-speed) ease;
+}
+@keyframes swap {
+  0%, 100% {
+    opacity: 0.99;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+@keyframes hide {
+  0% {
+    opacity: 0.99;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
