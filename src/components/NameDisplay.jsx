@@ -45,7 +45,7 @@ const showName = () => {
 };
 
 function NameDisplay(props) {
-  console.error('NameDisplay rendering!!', window.location.pathname, props);
+  // console.error('NameDisplay rendering!!', window.location.pathname, props);
   let displayName;
   let nameFontStyle = { fontSize: 'var(--name-font-size)' };
   let className = props.bulkMode ? 'quick' : undefined;
@@ -59,16 +59,16 @@ function NameDisplay(props) {
     }
     if (window.location.pathname !== '/namegenerator/') {
       className = 'not-showing';
-    } else if (props.nameData) {
+    } else if (props.dataReady) {
       if (document.getElementById('name-display') && document.getElementById('name-display').classList.contains('obscured')) {
         document.getElementById('name-display').classList.remove('obscured');
       }          
     }
     if (window.innerWidth < window.innerHeight) {
       if (displayName.length > 12) {
-        nameFontStyle.fontSize = window.innerWidth / 12;
+        nameFontStyle.fontSize = window.innerWidth / 11;
         if (displayName.length > 16) {
-          nameFontStyle.fontSize = `${window.innerWidth / 14}px`;
+          nameFontStyle.fontSize = `${window.innerWidth / 13}px`;
         }
       }
       if (displayName.length < 8) {

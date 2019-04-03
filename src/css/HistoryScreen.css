@@ -49,12 +49,10 @@
 }
 .listed-name {
   display: flex;
-  /* padding: 0.5vh; */
-  height: calc(var(--small-font-size) * 2.75);
+  height: calc(var(--small-font-size) * 2.5);
   align-items: center;
   padding-left: 2vmin;
   padding-right: 2vmin;
-  /* justify-content: center; */
   background: #090909;
   width: 100%;
 }

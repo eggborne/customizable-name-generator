@@ -92,8 +92,8 @@ export const namePatterns = {
       { type: 'consonantStarters', lengthRange: defaultLengthRange },
       { type: 'vowelUnits', lengthRange: defaultLengthRange },
       { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-      // { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
+      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
+      // { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
       { type: 'vowelUnits', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
       { type: 'literal', value: ' ', lengthRange: { min: 1, max: 1 } },
       { type: 'literal', value: 't', lengthRange: { min: 1, max: 1 } },
@@ -103,8 +103,8 @@ export const namePatterns = {
     lastName: [
       { type: 'consonantStarters', lengthRange: defaultLengthRange },
       { type: 'vowelUnits', lengthRange: { min: 1, max: 1 } },
-      { type: 'consonantEnders', lengthRange: { min: 1, max: 1 } },
-      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
+      { type: 'consonantEnders', lengthRange: defaultLengthRange },
+      // { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
     ],
   },
   'obi-wan': {
@@ -227,7 +227,7 @@ export default class NameGenerator {
           } else if (unit.type === 'repeater') {
             newPiece = nameData.wordUnits[wordType][unit.value];
           } else {
-            console.log('making fioterArray for type', unit.type)
+            // console.log('making filterArray for type', unit.type)
             let filterArray = this.cachedRules[unit.type];
             if (unit.exclude) {
               filterArray = filterArray.filter(wordUnit => !unit.exclude.includes(wordUnit[0]));
@@ -400,13 +400,14 @@ export default class NameGenerator {
         }
         nameData.nameArray = nameArray;
         let violationData = this.getViolations(nameData);
-        if (violationData.violation) {
-          // console.error('violationData', nameData.fullName, violationData);        
-        }
         nameData.banned = violationData.banned;
         nameData.invalid = violationData.invalid;
         nameData.violation = violationData.violation;
         nameData.style = mode;
+        if (violationData.violation) {
+          console.error('violationData', nameData.fullName, violationData);        
+          console.error('returning', nameData);        
+        }
         return nameData;
       } else {
         return { fullName: nameData.fullName, redundant: true }

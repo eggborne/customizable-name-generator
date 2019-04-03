@@ -18,7 +18,6 @@ function HistoryScreen(props) {
           let className = 'listed-name';
           if (nameData.banned) { className = 'listed-name green-text'; }
           if (nameData.invalid) { className = 'listed-name purple-text'; }
-          // return <div key={nameData.fullName} onPointerDown={() => { console.log('cock') }} className={className}>{nameData.fullName}</div>;
           return <Name key={nameData.fullName} onClickName={props.onClickName} className={className} nameData={nameData} nameEditing={props.nameEditing.fullName} />;
         })}
       </div>

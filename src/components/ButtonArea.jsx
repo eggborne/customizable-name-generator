@@ -45,7 +45,6 @@ const isEqual = (prevProps, nextProps) => {
     prevProps.simpleMode === nextProps.simpleMode &&
     prevProps.rejectedMode === nextProps.rejectedMode &&
     prevProps.readyToGenerate === nextProps.readyToGenerate;
-  console.warn('isEqual?', isEqual)
   return isEqual;
 }
 export default React.memo(ButtonArea, isEqual);

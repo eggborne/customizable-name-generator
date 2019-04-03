@@ -16,7 +16,7 @@
   --nav-font-size: calc(var(--base-font-size) * 0.65);
   --small-font-size: calc(var(--base-font-size) * 0.45);
 
-  --list-padding: 5vw;
+  --list-padding: 4vw;
   --footer-color: #151515;
   
   --button-border-color: rgb(9, 52, 9);
@@ -25,11 +25,17 @@
   --warning-button-border-color: rgb(50, 61, 25);
   --pressed-warning-button-border-color: rgb(34, 42, 17);
 
+  --danger-button-border-color: rgb(61, 25, 25);
+  --pressed-danger-button-border-color: rgb(42, 17, 17);
+
   --button-color: rgb(38, 100, 38);
   --pressed-button-color: rgb(28, 74, 28);
 
   --warning-button-color: rgb(100, 122, 49);
   --pressed-warning-button-color: rgb(82, 99, 41);
+  
+  --danger-button-color: rgb(122, 49, 49);
+  --pressed-danger-button-color: rgb(99, 41, 41);
   
   --special-button-color: green;
   --pressed-special-button-color: rgb(8, 91, 8);
@@ -47,6 +53,14 @@ body {
   display: flex;
   margin: 0;
   overflow: hidden;
+}
+h3 {
+  font-weight: normal;
+}
+.double-button {
+  grid-column-start: 0;
+  grid-column-end: span 2;
+  width: 100%;
 }
 #view-container { 
   background: #060e02;
@@ -175,10 +189,10 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  transition: opacity 210ms ease;
 }
 .shade.showing {
   /* z-index: 2; */
-  transition: opacity 210ms ease;
   pointer-events: all;
   opacity: 1;
 }
@@ -186,7 +200,7 @@ body {
   color: #afa;
 }
 .purple-text {
-  color: #99f;
+  color: #99f !important;
 }
 .lower-nav-panel {
   position: absolute;
@@ -201,6 +215,10 @@ body {
   box-shadow: 0px 0px 5px 0px black;
   border: 1px solid #090909;
   border-top: 0;
+}
+.lower-nav-panel.string-selected {
+  grid-template-columns: 1fr 1fr 1fr;
+
 }
 .lower-nav-panel > div {
   width: 100%;
@@ -217,6 +235,14 @@ body {
 }
 .lower-nav-panel.floating {
   grid-template-columns: 40% 1fr;
+}
+.feedback-button-area {
+  width: 100%;
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr; 
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
+  grid-row-gap: 1vh;
 }
 /* .lower-nav-panel button.bottom-nav {
   height: 7vh;
@@ -276,13 +302,16 @@ h2 {
   background-color: var(--footer-color);
   min-height: 11vh;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: start;
   justify-content:  space-between;
   padding: 2vh;
   box-shadow: 0px 0px 5px 0px black;
   border: 1px solid #090909;
   z-index: 4;
+}
+#history-title {
+  flex-direction: column;
+  align-items: center;
 
 }
 .title-info {
@@ -315,6 +344,34 @@ h2 {
 }
 .bulk-on > div {
   color: rgb(69, 69, 230);
+}
+#indicator-container {
+  position: fixed;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+#save-indicator {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  top: 0;
+  min-width: 30vmin;
+  height: 3vh;
+  background: #000000cc;
+  color: white;
+  height: var(--base-font-size);
+  font-size: var(--medium-font-size);
+  transform: translateY(-50%);
+  opacity: 0;
+  transition: transform 210ms ease, opacity 210ms ease;
+}
+#save-indicator.showing {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 

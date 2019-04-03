@@ -93,12 +93,12 @@ function Button(props) {
       disabled={props.disabled}
       id={`${props.type}-button`}
       {...{ [click]: (event) => { props.onClick(event, props.type) } }}
-      className={className + (props.selected ? ' selected' : '')}>
+      className={className + (props.selected ? ' selected' : '') + (props.discovered ? ' discovered' : '')}>
       {props.label}
     </button>
   );
 }
 const isEqual = (prevProps, nextProps) => {
-  return prevProps.selected == nextProps.selected && prevProps.disabled == nextProps.disabled && prevProps.unavailable == nextProps.unavailable;
+  return prevProps.selected == nextProps.selected && prevProps.label == nextProps.label && prevProps.disabled == nextProps.disabled && prevProps.discovered == nextProps.discovered && prevProps.unavailable == nextProps.unavailable;
 }
 export default React.memo(Button, isEqual);

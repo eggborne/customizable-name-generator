@@ -1,6 +1,5 @@
 button {
   font-family: var(--title-font);
-  font-weight: 900;
   border-radius: 0.5rem;
   font-size: var(--base-font-size);
   background-color: var(--button-color);
@@ -16,7 +15,7 @@ button {
   transition: transform var(--swap-speed) ease;
 }
 button:disabled {
-  background-color: gray !important;
+  background-color: gray;
   border-color: #333;
   color: #ccc;
   opacity: 0.85;
@@ -37,8 +36,14 @@ button.bounced {
 button.bottom-nav {
   height: 8vh;
   padding: 0;
+  padding-left: 2vw;
+  padding-right: 2vw;
   font-size: var(--nav-font-size);
   width: 28vw;
+}
+.clickable {
+  cursor: pointer;
+  transition: background-color 210ms ease;
 }
 .lower-nav-panel button.bottom-nav {
   height: 7vh;
@@ -125,12 +130,11 @@ button.bottom-nav {
 #choose-ruleset-button, #submit-feedback-button {
   width: 46vw;
 }
+#choose-ruleset-button:disabled {
+  pointer-events: none !important;
+}
 #clear-button:disabled {
   pointer-events: none;
-}
-#submit-feedback-button:disabled {
-  color: gray;
-  background-color: #444;
 }
 .remove-invalid-string-button {
   width: 100%;
@@ -140,26 +144,48 @@ button.bottom-nav {
   font-size: 0.3rem;
   padding: 0;
 }
-#rules-screen .add-invalid-string-button {
+#rules-screen .list-title-button {
+  font-size: var(--large-font-size);
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: var(--button-color);
-  outline: 0.4vh solid var(--button-border-color);
-  width: calc(var(--medium-font-size) * 4);
-  height: calc(var(--medium-font-size) * 2);
+  border: 0.4vh solid var(--button-border-color);
+  width: calc(var(--medium-font-size) * 2.5);
+  /* height: calc(var(--medium-font-size) * 2); */
+  height: calc(var(--medium-font-size) * 2.5);
+}
+#rules-screen .expand-list-button.pressed {
+  background-color: var(--pressed-button-color);
+  border-color: var(--pressed-button-border-color);
+}
+#rules-screen .expand-list-button i {
+  font-size: 4vh;
+  transform: rotate(0deg);
+  transition: transform 210ms ease;
+}
+#rules-screen .expand-list-button.pressed i {
+  transform: rotate(-180deg)
+}
+#rules-screen .expand-list-button.pressed {
+  background-color: var(--pressed-warning-button-color);
+  border-color: var(--pressed-warning-button-border-color);
+}
+#rules-screen .expand-list-button {
+  background-color: var(--warning-button-color);
+  border-color: var(--warning-button-border-color);
+  width: calc(var(--medium-font-size) * 3);
+}
+#rules-screen .expand-list-button > i {
+  margin: 0;
+  pointer-events: none;
 }
 #rules-screen .string-delete-button, 
 #rules-screen .string-edit-button {
   font-family: var(--title-font);
-  font-weight: 900;
-  /* position: absolute; */
-  /* transform: translateX(-0%); */
-  /* bottom: 0.25vh; */
   border-radius: 2px;
   font-size: calc(var(--small-font-size) / 3);
   border-width: 1px;
-  /* width: 3vw; */
   padding: 0;
   height: calc(var(--small-font-size) / 1.5);
   padding: calc(var(--small-font-size) / 8);
