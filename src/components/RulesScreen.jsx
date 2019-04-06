@@ -29,7 +29,7 @@ let ruleTypes = [
   ]
 ];
 
-class RulesScreen extends React.Component {
+class RulesScreen extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -47,7 +47,9 @@ class RulesScreen extends React.Component {
       editingSection: {
         listName: '',
         description: ''
-      }
+      },
+      loggingIn: false,
+      registering: false
     };
   }
 
@@ -124,9 +126,7 @@ class RulesScreen extends React.Component {
         }
       });
     });
-
     // document.getElementById('rule-description').innerHTML = `${category} - ${subCategory}`;
-  
     console.log('adding to', listName);
     this.setState({
       editingSection: {
@@ -134,15 +134,40 @@ class RulesScreen extends React.Component {
         description: `${category}`
       }
     });
-
+    this.props.setFeedbackMode('enter', listName, category)
   }
   handleClickCancelAdd = (event, listName) => {
+    
+  }
+  handleClickLogInButton = (event) => {
+    let loginArea = document.getElementById('login-header-area');
+    if (loginArea.classList.contains('logging-in')) {
+      console.log('has loggin-in')
+      loginArea.classList.remove('logging-in');
+    } else {
+      loginArea.classList.add('logging-in');
+    }
+    this.props.onClickCallLogin();
+  }
+  handleClickRegisterButton = () => {
+    this.setState({
+      loggingIn: true
+    });
+  }
+  handleUsernameInputChange = (event) => {
+    
+  }
+  handlePasswordInputChange = (event) => {
+    // event.target.value
+  }
+  handleClickLogOutButton = (event) => {
     
   }
 
   render() {
     console.error('rendering RulesScreen!!', this.props.ruleData);
-    let creatorName = this.props.ruleData.creator.split('-')[0];
+    // let creatorName = this.props.ruleData.creator.split('-')[0];
+    let creatorName = this.props.ruleData.creator;
     let unitTypes = [this.props.ruleData.consonantStarters, this.props.ruleData.consonantEnders, this.props.ruleData.vowelUnits];
     let bannedTypes = [this.props.ruleData.universal, this.props.ruleData.startWord, this.props.ruleData.midWord, this.props.ruleData.endWord, this.props.ruleData.loneWord, this.props.ruleData.invalidFollowers];
     let followerTypes = [this.props.ruleData.invalidFollowers];
@@ -181,44 +206,33 @@ class RulesScreen extends React.Component {
       .sort((a, b) => a.length - b.length);
     allUnits = [...new Set(allUnits)];
     let stringIsSelected = this.props.selectedString.string.length;
+    let credit = '';
+      if (this.props.ruleData.creator !== 'Default') {
+        credit = ` by ${this.props.ruleData.creator}`;
+      }
     return (
       <div className={this.props.location.location.pathname.includes('/rules') ? undefined : 'hidden'} id='rules-screen'>
-        <Router basename='/namegenerator/rules'>
-          <Route path='/' render={location =>
-            <AddStringScreen
-              location={location}
-              feedbackTypesSelected={this.props.feedbackTypesSelected}
-              feedbackTypesDiscovered={this.props.feedbackTypesDiscovered}
-              render={                
-                <>
-                  <div className='title-header' id='string-screen-title'>
-                    <div>ADD RULE</div>
-                    <div id='rule-description'>{this.state.editingSection.description}</div>
-                  </div>
-                  <div id='add-string-body'>
-                    <input onChange={(event) => this.props.onEnterLetter(event)} maxLength='5' placeholder='enter letters' type='text' id='submit-string-input'></input>
-                    <FeedbackButtonSelection
-                      feedbackTypesSelected={this.props.feedbackTypesSelected}
-                      feedbackTypesDiscovered={this.props.feedbackTypesDiscovered}
-                      onClickFeedback={this.props.onClickFeedback} />
-                  </div>
-                  <div className='lower-nav-panel floating'>
-                    <Link to='/' replace>
-                      <Button onClick={() => this.props.onClickCancelAdd} className='bottom-nav nav-link cancel-button' label={'CANCEL'} />
-                    </Link>
-                    <Link to={`/`} replace>
-                      <Button onClick={this.props.onClickSendFeedback} className='bottom-nav nav-link' label={'SUBMIT'} type='submit-string' />
-                    </Link>
-                  </div>
-                </>
-              }
-            />
-          } />
         <div className='title-header' id='rules-title'>
-          RULES
-          <div className='title-info' id='rules-info-display'>
-            Using ruleset #{this.props.ruleData.usingRuleset} '{this.props.ruleData.dialect}' by {creatorName}
+          <div id='rules-title-text'>RULES</div>
+          <div className='title-info'>
+            Using ruleset #{this.props.ruleData.usingRuleset} '{this.props.ruleData.dialect}'{credit}
           </div>
+          <div id='login-header-area'>
+              {this.props.userLoggedIn ?
+              <>
+                <div className='logged-in' id='login-instructions'>
+                  Logged in as {this.props.username} <small>(#{this.props.userID})</small>
+                </div>
+                <Button onClick={(event) => this.props.onClickLogOut(event)} className='mini-button' label={'LOG OUT'} type='log-out' />
+              </>
+              :
+              <>
+              <div id='login-instructions'>Log in to save your changes</div>
+              <Button onClick={(event) => this.props.onClickCallLogin(event)} className='mini-button' label={'LOG IN'} type='log-in' />
+              <Button onClick={(event) => this.props.onClickRegister(event)} className='mini-button' label={'REGISTER'} type='register' />
+              </>
+            }  
+            </div>
         </div>
         <div id='rules-list'>
           {ruleTypes.map((ruleArr, r) => {
@@ -249,9 +263,7 @@ class RulesScreen extends React.Component {
                             </div>                            
                           </div>
                           <div className='list-button-area'>
-                            <Link to='/addrule'>
-                              <div onClick={event => this.handleClickAdd(event, list.id)} className='list-title-button add-invalid-string-button clickable'>+</div>
-                            </Link>
+                            <div onClick={event => this.handleClickAdd(event, list.id)} className='list-title-button add-invalid-string-button clickable'>+</div>
                             <div onClick={event => this.toggleSectionOpen(event, list.id)} className={collapsed ? 'list-title-button expand-list-button clickable' : 'list-title-button expand-list-button clickable pressed'}>
                               <i className='material-icons'>arrow_drop_down</i>
                             </div>
@@ -316,9 +328,7 @@ class RulesScreen extends React.Component {
                             </div>
                           </div>
                           <div className='list-button-area'>
-                            <Link to='/addrule'>
-                              <div onClick={event => this.handleClickAdd(event, list.id)} className={'list-title-button add-invalid-string-button'}>+</div>
-                            </Link>
+                            <div onClick={event => this.handleClickAdd(event, list.id)} className={'list-title-button add-invalid-string-button'}>+</div>
                             <div onClick={event => this.toggleSectionOpen(event, list.id)} className={collapsed ? 'list-title-button expand-list-button clickable' : 'list-title-button expand-list-button clickable pressed'}>
                               <i className='material-icons'>arrow_drop_down</i>                              
                             </div>                           
@@ -375,7 +385,6 @@ class RulesScreen extends React.Component {
             );
           })}
         </div>
-        </Router>
         {stringIsSelected ? (
           <div className={stringIsSelected ? 'lower-nav-panel string-selected' : 'lower-nav-panel'}>
             <div>
@@ -385,7 +394,7 @@ class RulesScreen extends React.Component {
             </div>
             <div>
               <div>
-                <Button onClick={() => null} className='bottom-nav nav-link' label={`EDIT '${this.props.selectedString.string.toUpperCase()}'`} type='rules-edit-string' />
+                <Button onClick={(event) => this.props.onClickEdit(event, this.props.selectedString.ruleType)} className='bottom-nav nav-link' label={`EDIT '${this.props.selectedString.string.toUpperCase()}'`} type='rules-edit-string' />
               </div>
             </div>
             <div>

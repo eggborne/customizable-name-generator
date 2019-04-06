@@ -1,0 +1,99 @@
+#login-shade {
+  justify-content: flex-start;
+  padding-top: 12.5vw;
+  display: flex;
+}
+#login-window {
+  background: #191919;
+  width: 75vw;
+  /* height: 45vh; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  justify-self: start;
+  opacity: 1;
+  /* padding-top: 3vh; */
+  padding-bottom: 4vh;
+  border-radius: var(--button-border-radius);
+  transform: translateY(-25%);
+  transition: transform 210ms ease, opacity 210ms ease;
+}
+form {
+  display: flex;
+  flex-direction: column;  
+  align-items: center;
+  justify-content: flex-end;
+  flex-grow: 1;
+  width: 70%;
+}
+#login-window.showing {
+  opacity: 1;
+  transform: translateY(0);
+}
+#login-title {
+  text-align: center;
+  font-family: var(--title-font);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  line-height: 140%;
+  font-size: calc(var(--name-font-size) / 1.25);
+  padding: 1vh;
+  border-bottom: 0.25vh solid #222;
+  margin-bottom: 3vh;
+}
+#login-window .medium-input {
+  font-family: 'Nova Square';
+  border-radius: 0.5vh;
+  text-align: center;
+  font-size: var(--large-font-size);
+  height: var(--name-font-size);  
+  width: 100%;
+  margin-bottom: 2vh;
+}
+#login-window .medium-input-label {
+  font-size: var(--medium-font-size);
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.5vh;
+}
+#stay-logged-in-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--small-font-size);
+  margin-top: 1vh;  
+}
+#stay-logged-in-toggle > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgb(104, 74, 74);
+  border: 0.1rem solid rgb(126, 84, 84);
+  padding: 2vh;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  align-self: center;
+}
+#stay-logged-in-toggle > div.selected {
+  background-color: rgb(83, 114, 85);
+  border-color: white;
+}
+#send-register-button, #send-login-button {
+  /* padding-top: 3vh;
+  padding-bottom: 3vh; */
+  margin-top: 3vh;
+  height: 9vh;
+  width: 45vmin;
+}
+#send-register-button.disabled, #send-login-button.disabled {
+  background: var(--warning-button-color);
+  border-color: var(--warning-button-border-color);
+  border-color: #444;
+  color: #999;
+  pointer-events: none;
+
+}

@@ -10,9 +10,11 @@ import HistoryScreen from './components/HistoryScreen.jsx';
 import RulesScreen from './components/RulesScreen.jsx';
 import RulesetSelect from './components/RulesetSelect.jsx';
 import FeedbackWindow from './components/FeedbackWindow.jsx';
+import LoginWindow from './components/LoginWindow.jsx';
+import {v4 as uuid} from 'uuid';
 
 window.addEventListener('DOMContentLoaded', event => {
-  console.log('DOM fully loaded and parsed in', window.performance.now() - initialLoad);
+  console.log('DOM fully loaded and parsed in', window.performance.now() - initialLoad);  
 });
 
 let initialLoad = window.performance.now();
@@ -26,11 +28,11 @@ let ROOT;
 //   // ROOT = `php/`;
 //   ROOT = 'https://api.eggborne.com/namegenerator/';
 // }
-if (!PROD) {
+// if (!PROD) {
   ROOT = 'https://eggborne.com/namegenerator/php/';
-} else {
-  ROOT = `php/`;
-}
+// } else {
+  // ROOT = `php/`;
+// }
 const clickListeners = {
   onPointerDown: {
     lowerCase: {
@@ -63,12 +65,78 @@ const clickListeners = {
     }
   }
 };
+
+let cookieRecognized = false;
+
+
 const clickFunction = window.PointerEvent ? 'onPointerDown' : window.TouchEvent ? 'onTouchStart' : 'onMouseDown';
 const clickListener = clickListeners[clickFunction];
 console.log(clickListener);
 
 export const swapSpeed = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--swap-speed'));
 
+function logUserIn(username, pass, cookieID) {
+  console.warn('logging user');
+  console.warn(username);
+  console.warn(pass);
+  console.warn(cookieID);
+  let userData = {
+    dbName:'eggbxhyo_language',
+    username: username.toString(),
+    pass: pass.toString(),
+    cookieID: cookieID
+  };
+  return axios({
+    method: 'post',
+    url: `${ROOT}loguserin.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: JSON.stringify(userData)
+  });
+}
+function createNewUser(username, pass, cookieID) {
+  console.warn('creating user');
+  console.warn(username);
+  console.warn(pass);
+  console.warn(cookieID);
+  let userData = {
+    username: username.toString(),
+    pass: pass.toString(),
+    cookieID: cookieID
+  };
+  return axios({
+    method: 'post',
+    url: `${ROOT}createnewuser.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: JSON.stringify(userData)
+  });
+}
+function getDataForUser(username, pass) {
+  
+  return axios({
+    method: 'post',
+    url: `${ROOT}getuserdata.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: {
+      username: username,
+      pass: pass
+    }
+  });
+}
+function getRulesets() {
+  return axios({
+    method: 'get',
+    url: `${ROOT}getallrulesets.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    }
+  });
+}
 function getRules(rulesIndex) {
   console.log(`${PROD} to getRules from ID ${rulesIndex} from ${ROOT}`);
   return axios({
@@ -93,6 +161,7 @@ function getAllRulesets() {
   });
 }
 
+
 function sendFeedback(feedbackObj) {
   let ruleData = { ...this.state.ruleData };
   for (let listType in ruleData) {
@@ -116,6 +185,25 @@ function sendFeedback(feedbackObj) {
   }, () => {
     console.log('SET local rules.')
   })
+}
+
+function updateRuleset(userID, rulesetID, newRuleObj) {
+  console.warn('sending rules')
+  console.warn(rulesetID, newRuleObj)
+  let newStringList = [];
+  return axios({
+    method: 'post',
+    url: `${ROOT}sendnewrules.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: {
+      list: 'startWord',
+      userID: userID,
+      rulesetID: rulesetID,
+      newStringList: newStringList
+    }
+  });
 }
 
 function sendNewRules(rulesObj) {
@@ -155,36 +243,108 @@ function sendNewRules(rulesObj) {
   console.table(rawData)
   return axios({
     method: 'post',
-    url: `${ROOT}sendnewrules.php`,
+    url: `${ROOT}sendnewrules2.php`,
     headers: {
-      'Content-type': 'application/x-www-form-urlencoded',
-
-      //'Content-type': 'application/json'
+      'Content-type': 'application/x-www-form-urlencoded'
     },
     data: JSON.stringify(rawData)
   });
-} 
+}
+
+const setCookie = (cookieName, cookieObj, daysToExpire) => {
+  console.warn('called setCookie')
+  cookieObj = JSON.stringify(cookieObj);
+  console.log('cookieValue', cookieObj);
+  let expirationDate = new Date();
+  expirationDate.setTime(expirationDate.getTime() + (daysToExpire * 24 * 60 * 60 * 1000));
+  let expires = 'expires=' + expirationDate.toUTCString();
+  // document.cookie = `{${cookieName}: ${JSON.stringify(cookieObj)}};${expires};path=/}`;
+  document.cookie = cookieName + '=' + cookieObj + ';' + expires + ';path=/';
+
+};
+const getCookie = (cookieName) => {
+  console.warn('called getCookie')
+  return new Promise((resolve, reject) => {
+    let decodedCookie = decodeURIComponent(document.cookie);
+    console.info('decodedCookie:', decodedCookie);
+    if (decodedCookie) {
+      let cookies = decodedCookie.split(';');
+      console.log('cookies', cookies);
+      let matchingCookie = cookies.filter(cookie => cookie.includes(cookieName));
+      console.log('matching?', matchingCookie.length);
+      if (matchingCookie.length) {
+        matchingCookie = matchingCookie[0].split('=');
+        console.log('PARSED?', matchingCookie);
+        matchingCookie[1] = JSON.parse(matchingCookie[1]);
+        let cookieName = matchingCookie[1].username;
+        let cookieID = matchingCookie[1].sessionID;
+        if (!cookieID) {
+          console.error('-------------------------------------------- DELETING COOKIE THAT HAS NO ASSOCIATED SESSION ID <<<<<<<<<<<<<<<<<<<<<<<<<<')
+          setCookie('namecreator', null, 0);
+          requestAnimationFrame(getCookie('namecreator'));
+        }
+        console.log(cookieName);
+        console.log(cookieID);
+        if (matchingCookie[0] === 'namecreator') {
+          resolve({
+            username: cookieName,
+            sessionID: cookieID
+          });
+        }
+      }
+    } else {
+      resolve(false);
+      console.error('--------------------------------- NO COOKIE ==========>')
+    }
+  });
+};
+async function checkCookie() {
+  console.warn('called checkCookie')
+  let startTime = window.performance.now();
+
+  let checkResult = await getCookie('namecreator');
+
+  console.log('checkResult', checkResult)
+
+  return checkResult;
+
+  // getCookie('namecreator').then((response) => {
+  //   console.log('cehckCookie > getCookie.then gave repsosen', response)
+  //   if (response) {
+  //     console.warn('checked cookie in', window.performance.now() - startTime);
+  //     console.log('got a cookie response!', response);
+  //     return response;
+  //   }
+  //   if (reject) {
+  //     console.log('reject', reject)
+  //   }
+  // })
+};
+const destroyCookie = () => {
+  checkCookie().then(response => {
+    if (response) {
+      setCookie('namecreator', response, 0);
+      console.error('DELETED COOKIE!');
+    } else {
+      console.error('NO COOKIE TO DELETE!');
+    }
+  })
+}
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentNameStyle: 'random',
-      username: 'custom',
-      scanMode: false,
+      checkedCookie: false,
+      username: null,
+      userID: null,
+      userLoggedIn: false,
+      saveCookie: true,
+      titleText: 'searching for user...',
       bulkAmount: 50,
-      scanning: false,
-      generating: false,
-      searching: false,
-      userStopped: false,
       dirtyMode: false,
-      blockMode: true,
-      defaultSegmentSize: 90,
-      segmentSize: 90,
-      charactersGenerated: [],
-      namesGenerated: 0,
-      loop: 1,
-      startScan: null,
+      blockMode: true,      
       wordData: {},
       animationSpeed: 105,
       lastRequested: 0,
@@ -232,21 +392,29 @@ class App extends Component {
       lastUpdated: 0,
       hasNewRules: true,
       feedbackMode: false,
-      nameEditing: { fullName: 'Bob' },
+      nameEditing: { fullName: null },
+      currentEditType: null,
       selectedString: {        
         string: '',
         elementIds: [],
         indexes: [],
         id: '',
-        ruleType: ''
+        ruleType: '',
+        preceder: '',
+        follower: ''
       },
+      inputFocused: null,
       selectedLetters: [],
       statusText: 'Loading ruleset...',
       fingerData: {
         fingerDownAt: 0,
         fingerDown: false
       },
-      loadingProgress: 0
+      loadingProgress: 0,
+      loginAction: null,
+      usernameOk: false,
+      passwordOk: false,
+      passwordsMatch: false
     };
     this.generator = new NameGenerator();
     
@@ -256,37 +424,254 @@ class App extends Component {
     } else if (!PROD && window.location.pathname === '/') {
       window.location.pathname = '/namegenerator/';
     }
-    let startRules = window.performance.now();
-    let mountTime = window.performance.now();
-    this.refreshRules().then(newRuleData => {
-      let ruleTime = window.performance.now();
-      console.error('APP CONSTRUCTOR TOOK', window.performance.now() - initialLoad);
-      getAllRulesets().then(response => {
-        let rulesTime = window.performance.now();
-        console.error('GOT RULESETS IN', rulesTime - ruleTime);
-        response.data.map(ruleset => {
-          for (let listType in ruleset) {
-            if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
-              ruleset[listType] = JSON.parse(ruleset[listType]);
-            }
+    
+      // .then(cookie => {
+      //   console.warn('got then from checkCookie:', cookie)
+        // if (cookie) {
+          // cookieRecognized = true;
+          // console.warn('GOT A GODDAMNED COOKIE !!!!!!!!!!!!!!', cookie);
+          // this.setState({
+          //   username: cookie.username,
+          //   cookieID: cookie.cookieID
+          // }, () => {
+          //   console.warn('LOG THAT SUCKER IN +++++++++++')
+          //   this.attemptLogin(this.state.username, 'abc', this.state.cookieID);
+              
+            // logUserIn(this.state.username, 'aa', this.state.cookieID).then(response => {
+            //   console.log('suck my balls', response);
+            // });
+          // });
+        // } else {
+        //   console.error('no cookie in initial checkcookie.then')
+        // }
+      
+      // getRulesets().then(allRulesets => {
+      //   console.info('rulesets?', allRulesets);
+      //   allRulesets.data.map(ruleset => {
+      //     for (let listType in ruleset) {
+      //       if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+      //         ruleset[listType] = JSON.parse(ruleset[listType]);
+      //       }
+      //     }
+      //   });
+      //   let userID = this.state.userID || 0;
+      //   let rulesIndex = 3;
+      //   let newRuleData =  allRulesets.data.filter(ruleset => ruleset.index === 3)[0];
+      //   if (userID) {
+      //     console.log('only creator with ID', userID)
+      //     let userOnlyRulesets = allRulesets.data.filter(ruleset => ruleset.creatorID === userID);
+      //     rulesIndex = userOnlyRulesets[0].index;
+      //     newRuleData = userOnlyRulesets[0];
+      //   }
+      //   newRuleData.usingRuleset = rulesIndex;
+      //   newRuleData.rulesetSelected = rulesIndex;
+      //   newRuleData.rulesets = [];
+      //   newRuleData.rulesIndex = rulesIndex
+      //   // newRuleData.creator = ;
+      //   console.info('newRuleData',newRuleData)
+      //   this.displayNewName(newRuleData);
+      //   this.setState({
+      //     ruleData: newRuleData,
+      //     username: this.state.username,
+      //     userID: this.state.userID,
+      //     dataReady: true,
+      //     hasNewRules: true,
+      //     statusText: `Using ruleset #${newRuleData.index} '${newRuleData.dialect}' by Default`,
+      //     titleText: `not logged in`,
+      //     userLoggedIn: loggedIn
+      //   });
+      // });
+
+    // });
+
+    // try to get cookie and then...
+
+    // if (!cookieRecognized) {
+    
+      // getRulesets().then(allRulesets => {
+      //   console.info('rulesets?', allRulesets);
+      //   allRulesets.data.map(ruleset => {
+      //     for (let listType in ruleset) {
+      //       if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+      //         ruleset[listType] = JSON.parse(ruleset[listType]);
+      //       }
+      //     }
+      //   });
+      //   let userOnlyRulesets = allRulesets.data.filter(ruleset => ruleset.creatorID === '2');
+      //   let lastEditedRuleset = userOnlyRulesets[0];
+      //   let rulesIndex = lastEditedRuleset.index;
+      //   let newRuleData = lastEditedRuleset;
+      //   newRuleData.usingRuleset = rulesIndex;
+      //   newRuleData.rulesetSelected = rulesIndex;
+      //   newRuleData.rulesets = [];
+      //   newRuleData.rulesIndex = rulesIndex
+      //   // newRuleData.creator = ;
+      //   console.info('newRuleData',newRuleData)
+      //   this.displayNewName(newRuleData);
+      //   this.setState({
+      //     statusText: `Using ruleset #${newRuleData.index} '${newRuleData.dialect}' by Default`,
+      //     titleText: `not logged in`,
+      //     ruleData: newRuleData,
+      //     username: this.state.username,
+      //     userID: this.state.userID,
+      //     dataReady: true,
+      //     hasNewRules: true,
+      //     userLoggedIn: loggedIn
+      //   });
+      // });
+    
+    // } else {
+      // let user = this.state.username;
+      // let pass = null;
+      // let cookieID = this.state.cookieID;
+      // getDataForUser(user, pass).then(userData => {
+      //   if (userData.data) {
+      //     console.info(userData.data)
+      //     let userID = userData.data.id;
+      //     let username = userData.data.username;
+      //     let rulesetIndexes = JSON.parse(userData.data.rulesets);
+      //     loggedIn = true;
+      //     console.log('logged in!');
+      //     console.log('userId', userID);
+      //     console.log('username', username);
+      //     console.log('rulesetIndexes', rulesetIndexes);
+      //     getRulesets().then(allRulesets => {
+      //       console.info('rulesets?', allRulesets);
+      //       allRulesets.data.map(ruleset => {
+      //         for (let listType in ruleset) {
+      //           if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+      //             ruleset[listType] = JSON.parse(ruleset[listType]);
+      //           }
+      //         }
+      //       });
+      //       console.info('now', allRulesets.data);
+      //       let userOnlyRulesets = allRulesets.data.filter(ruleset => ruleset.creatorID === userID);
+      //       console.log('userOnlyRulesets', userOnlyRulesets);
+      //       let lastEditedRuleset = userOnlyRulesets[userOnlyRulesets.length - 1];
+      //       console.log('lastEditedRuleset', lastEditedRuleset);
+      //       let rulesIndex = lastEditedRuleset.index;
+      //       let newRuleData = lastEditedRuleset;
+      //       newRuleData.usingRuleset = rulesIndex;
+      //       newRuleData.rulesetSelected = rulesIndex;
+      //       newRuleData.rulesets = allRulesets.data;
+      //       newRuleData.rulesIndex = rulesIndex;
+      //       newRuleData.creator = username;
+      //       console.info('newRuleData', newRuleData)
+      //       this.displayNewName(newRuleData);
+      //       this.setState({
+      //         statusText: `Using ruleset #${newRuleData.index} '${newRuleData.dialect}' by ${username}`,
+      //         titleText: `Logged in as ${username}`,
+      //         ruleData: newRuleData,
+      //         username: username,
+      //         createdRulesets: rulesetIndexes,
+      //         userID: userID,
+      //         dataReady: true,
+      //         hasNewRules: true,
+      //         userLoggedIn: loggedIn
+      //       });
+      //     });
+      //   }
+      // });
+    // }
+
+
+
+
+    // this.refreshRules().then(newRuleData => {
+    //   let ruleTime = window.performance.now();
+    //   console.error('APP CONSTRUCTOR TOOK', window.performance.now() - initialLoad);
+    //   getAllRulesets().then(response => {
+    //     let rulesTime = window.performance.now();
+    //     console.error('GOT RULESETS IN', rulesTime - ruleTime);
+    //     response.data.map(ruleset => {
+    //       for (let listType in ruleset) {
+    //         if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+    //           ruleset[listType] = JSON.parse(ruleset[listType]);
+    //         }
+    //       }
+    //     });
+    //     let newRuleData = { ...this.state.ruleData };
+    //     newRuleData.rulesets = response.data;
+    //     this.setState(
+    //       {
+    //         statusText: `Using ruleset '${newRuleData.dialect}' by ${newRuleData.creator.split('-')[0]}`,
+    //         ruleData: newRuleData,
+    //         lastUpdated: Date.now()
+    //       },
+    //       () => {
+    //         // document.body.addEventListener(clickListener.lowerCase.down, this.bodyFingerDown);
+    //         // document.body.addEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
+    //       }
+    //     );
+    //   });
+    // });
+  }
+
+  logUserInIfCookieOK = async () => {
+    let loggedIn = false;
+    console.warn('calling initial checkCookie');
+    let cookieResult = await checkCookie('namecreator');  
+    console.log('cookieResult', cookieResult);
+    let username = 'Guest';
+    let sessionID = null;
+    let loginInfo;
+    if (cookieResult) {
+      cookieRecognized = true;
+      username = cookieResult.username;
+      sessionID = cookieResult.sessionID
+      console.warn('GOT A GODDAMNED COOKIE !!!!!!!!!!!!!!', cookieResult);
+      this.setState({
+        username: username,
+        cookieID: sessionID
+      }, () => {
+        console.warn('LOG THAT SUCKER IN +++++++++++', this.state)
+      });
+      loginInfo = await this.attemptLogin(username, 'abc', sessionID);
+    }
+    console.log('loginInfo...', loginInfo);
+    console.log('state now?', this.state.userID)
+    getRulesets().then(allRulesets => {
+      console.info('rulesets?', allRulesets);
+      allRulesets.data.map(ruleset => {
+        for (let listType in ruleset) {
+          if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+            ruleset[listType] = JSON.parse(ruleset[listType]);
           }
-        });
-        let newRuleData = { ...this.state.ruleData };
-        newRuleData.rulesets = response.data;
-        this.setState(
-          {
-            statusText: `Using ruleset '${newRuleData.dialect}' by ${newRuleData.creator.split('-')[0]}`,
-            ruleData: newRuleData,
-            lastUpdated: Date.now()
-          },
-          () => {
-            // document.body.addEventListener(clickListener.lowerCase.down, this.bodyFingerDown);
-            // document.body.addEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
-          }
-        );
+        }
+      });
+      console.log('established userID as', this.state.userID)
+      let userOnlyRulesets = allRulesets.data.filter(ruleset => ruleset.creatorID == this.state.userID);
+      console.info('userCreated', userOnlyRulesets)
+      let lastEditedRuleset = userOnlyRulesets[0] || allRulesets.data.filter(ruleset => ruleset.index == 42)[0];
+      let rulesIndex = lastEditedRuleset.index;
+      let newRuleData = lastEditedRuleset;
+      newRuleData.usingRuleset = rulesIndex;
+      newRuleData.rulesetSelected = rulesIndex;
+      newRuleData.rulesets = [];
+      newRuleData.rulesIndex = rulesIndex      
+      this.displayNewName(newRuleData);
+      let credit = '';
+      if (newRuleData.creator !== 'Default') {
+        credit = ` by ${newRuleData.creator}`;
+      }
+      let titleText = this.state.titleText;
+      if (!this.state.userLoggedIn) {
+        titleText = 'not logged in'
+      }
+      this.setState({
+        statusText: `Using ruleset #${newRuleData.index} '${newRuleData.dialect}'${credit}`,
+        titleText: titleText,
+        ruleData: newRuleData,
+        username: this.state.username,
+        userID: this.state.userID,
+        dataReady: true,
+        hasNewRules: true,
+        username: username,
+        cookieID: sessionID
       });
     });
   }
+
   bodyFingerDown = event => {
     this.setState({
       fingerData: { fingerDown: event, fingerDownAt: Date.now() }
@@ -299,6 +684,7 @@ class App extends Component {
   }
   componentDidMount = () => {
     console.error('mount took', window.performance.now() - initialLoad);
+    this.logUserInIfCookieOK();
     document.body.addEventListener(clickListener.lowerCase.down, this.bodyFingerDown);
     document.body.addEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
   }
@@ -325,8 +711,8 @@ class App extends Component {
   }
 
   handleClickGenerate = event => {
-    // this.bounceButton(event);
     console.error('------- generate');
+    // this.bounceButton(event);
     let rulesToSend;
     if (this.state.hasNewRules) {
       rulesToSend = this.state.ruleData;
@@ -636,29 +1022,25 @@ class App extends Component {
     console.log('get those rulesets');
     let sinceUpdated = Date.now() - this.state.lastUpdated;
     console.error('SINCE ---------------------', sinceUpdated)
-    if (sinceUpdated > 3000) {
-      getAllRulesets().then(response => {        
-        console.log('got those rulesets', response);
-        response.data.map(ruleset => {
-          for (let listType in ruleset) {
-            if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
-              ruleset[listType] = JSON.parse(ruleset[listType]);
-            }
+    getAllRulesets().then(response => {        
+      console.log('got those rulesets', response);
+      response.data.map(ruleset => {
+        for (let listType in ruleset) {
+          if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+            ruleset[listType] = JSON.parse(ruleset[listType]);
           }
-        });
-        let newRuleData = { ...this.state.ruleData };
-        newRuleData.rulesets = response.data;
-        this.setState({
-          ruleData: newRuleData,
-          hasNewRules: true,
-          lastUpdated: Date.now()
-        }, () => {
-          setTimeout(() => { this.showMessage('Got ruleset list.', 1600) }, 1);          
-        });
+        }
       });
-    } else {
-      // show the existing list
-    }
+      let newRuleData = { ...this.state.ruleData };
+      newRuleData.rulesets = response.data;
+      this.setState({
+        ruleData: newRuleData,
+        hasNewRules: true,
+        lastUpdated: Date.now()
+      }, () => {
+        setTimeout(() => { this.showMessage('Got ruleset list.', 1600) }, 1);          
+      });
+    });
   };
   handleDismissRulesetSelect = event => {
     let newRuleData = { ...this.state.ruleData };
@@ -680,28 +1062,56 @@ class App extends Component {
     }
   };
   handleChooseNewRuleset = () => {
-    console.log('clicked change to new!')
     let newRuleData = { ...this.state.ruleData };
+    console.log('clicked change to', newRuleData.rulesetSelected, 'from', newRuleData.usingRuleset)
     newRuleData.usingRuleset = newRuleData.rulesetSelected;
-    console.log('new rules?', newRuleData);
+    console.log('rulesets', newRuleData.rulesets);
+    let newRuleset = newRuleData.rulesets.filter(ruleset => ruleset.index.toString() === newRuleData.usingRuleset.toString())[0];
+    console.log('newRuleset', newRuleset);
+    // newRuleData = newRuleset;
+    newRuleset.rulesets = newRuleData.rulesets;
+    newRuleset.usingRuleset = newRuleData.rulesetSelected;
+    newRuleset.rulesetSelected = newRuleData.rulesetSelected;
+    console.log('usingRuleset', newRuleData.usingRuleset);
+    console.log('newRuleData.rulesetSelected',newRuleData.rulesetSelected)
+    console.log('switched')
+    console.info(newRuleset)
     this.setState(
       {
-        ruleData: newRuleData
+        ruleData: newRuleset,
+        statusText: `Using ruleset '${newRuleset.dialect}' by ${newRuleset.creator}`,        
       },
       () => {
-        this.refreshRules().then(() => {
+        
+        // getRulesets().then((allRulesets) => {
           setTimeout(() => { this.showMessage('Changed ruleset to #' + newRuleData.usingRuleset, 1600) }, 1);
-        });
+        // });
+        // this.refreshRules().then(() => {
+        //   setTimeout(() => { this.showMessage('Changed ruleset to #' + newRuleData.usingRuleset, 1600) }, 1);
+        // });
       }
     );
   };
   handleClickName = (event, nameData) => {
     document.getElementById('feedback-panel').style.transformOrigin = `${event.clientX}px ${event.clientY}px`;
     this.setState({
-      feedbackMode: true,
+      feedbackMode: 'editName',
       nameEditing: nameData
     });
   };
+  setFeedbackMode = (newMode, listName, category) => {
+    let feedbackTypesSelected = [...this.state.feedbackTypesSelected];
+    let currentEditType = this.state.currentEditType;
+    if (newMode === 'enter' || newMode === 'editString') {
+      feedbackTypesSelected.push(listName);
+      currentEditType = listName;
+    }
+    this.setState({
+      feedbackMode: newMode,
+      currentEditType: currentEditType,
+      feedbackTypesSelected: feedbackTypesSelected
+    });
+  }
   getNameData = fullName => {
     for (let nameEntry in this.state.productionData.namesList) {
       let nameData = this.state.productionData.namesList[nameEntry];
@@ -729,23 +1139,9 @@ class App extends Component {
     }
   };
 
-  handleClickEdit = event => {
-    // testing sendNewRules!
-    // console.log(event.target);
-    // let newRuleData = { ...this.state.ruleData };
-    // let creatorName = `custom-${Date.now()}`;
-    // newRuleData.rulesetSelected = creatorName;
-    // console.warn('sending', newRuleData.rulesetSelected, 'rules. last:', newRuleData.creator);
-    // sendNewRules(newRuleData).then(response => {
-    //   let newRuleData = { ...this.state.ruleData };
-    //   console.log('sendNewRules got', response);
-    //   newRuleData.rulesetSelected = creatorName;
-    //   newRuleData.usingRuleset = creatorName;
-    //   newRuleData.creator = creatorName;
-    //   this.setState({
-    //     ruleData: newRuleData
-    //   });
-    // });
+  handleClickEdit = (event, type) => {
+    console.log(event.target.innerHTML, type)
+    this.setFeedbackMode('editString', type);
   };
 
   handleClickWordPiece = (event, ruleType, clear) => {
@@ -779,7 +1175,7 @@ class App extends Component {
       };
     }
     this.setState({
-      selectedString: selected
+      selectedString: selected,
     });
   };
 
@@ -909,31 +1305,31 @@ class App extends Component {
         }
       }
       let newRuleData = { ...this.state.ruleData };
-      newRuleData.rulesetSelected = newRuleData.creator;      
+      newRuleData.rulesetSelected = newRuleData.creator;
       console.warn('sending', newRuleData.rulesetSelected, 'rules. last:', newRuleData.creator);
-        sendNewRules(newRuleData).then(response => {
-          if (response) {
-            setTimeout(() => { this.showMessage(`Rule for '${feedbackObj.string.toUpperCase()}' saved.`, 1600) }, 1);
-          }
-          let newRuleData = { ...this.state.ruleData };
-          // let creatorName = `${this.state.username}-${Date.now()}`;
-          newRuleData.rulesetSelected = response.data;
-          newRuleData.usingRuleset = response.data;
-          this.setState({
-            ruleData: newRuleData
-          }, () => {
-            let rulesArr = this.findRulesForString(feedbackObj.string);
-            let feedbackTypesDiscovered = [...this.state.feedbackTypesDiscovered];
-            if (rulesArr.length) {
-              rulesArr.map(ruleType => {
-                feedbackTypesDiscovered.push(ruleType);
-              });
-            } else {
-              feedbackTypesDiscovered = [];
-            }
-            this.setState({
-              feedbackTypesDiscovered: feedbackTypesDiscovered
+      sendNewRules(newRuleData).then(response => {
+        if (response) {
+          setTimeout(() => { this.showMessage(`Rule for '${feedbackObj.string.toUpperCase()}' saved.`, 1600) }, 1);
+        }
+        let newRuleData = { ...this.state.ruleData };
+        // let creatorName = `${this.state.username}-${Date.now()}`;
+        newRuleData.rulesetSelected = response.data;
+        newRuleData.usingRuleset = response.data;
+        this.setState({
+          ruleData: newRuleData
+        }, () => {
+          let rulesArr = this.findRulesForString(feedbackObj.string);
+          let feedbackTypesDiscovered = [...this.state.feedbackTypesDiscovered];
+          if (rulesArr.length) {
+            rulesArr.map(ruleType => {
+              feedbackTypesDiscovered.push(ruleType);
             });
+          } else {
+            feedbackTypesDiscovered = [];
+          }
+          this.setState({
+            feedbackTypesDiscovered: feedbackTypesDiscovered
+          });
         });
       });
     });
@@ -950,7 +1346,11 @@ class App extends Component {
       rules: this.state.feedbackTypesSelected
     };
     console.info('sending feedback', feedback)
-    this.submitFeedback(feedback);
+    if (this.state.userLoggedIn) {
+      this.submitFeedback(feedback);
+    } else {
+
+    }
       // .then(response => {
       //   console.log('response', response)
       // });
@@ -994,6 +1394,214 @@ class App extends Component {
 
   }
 
+  handleClickInput = (event) => {
+    if (this.state.feedbackMode === 'editName') {
+      event.target.value = '';
+    };
+    console.log('setting',event.target.id)
+    this.setState({
+      inputFocused: event.target.id
+    })
+  }
+
+  handleClickWordUnit = (event) => {
+    let unit = event.target.innerHTML;
+    console.log(unit)
+    console.log(this.state.inputFocused)
+    if (!this.state.inputFocused) {
+      let precederInput = document.getElementById('submit-preceder-input');
+      let followerInput = document.getElementById('submit-follower-input');
+      if (!precederInput.value) {
+        precederInput.value = unit;
+        followerInput.focus();
+        this.setState({
+          inputFocused: 'submit-follower-input'
+        })
+      }
+    } else {
+      document.getElementById(this.state.inputFocused).value = unit;
+    }
+  }
+  handleClickRegister = (event) => {
+    this.setState({
+      loginAction: 'registering'
+    });
+  }
+  handleClickLogOut = (event) => {
+    
+  }
+  handleLoginUsernameInputChange = (event) => {
+    let value = event.target.value;
+    this.setState({
+      usernameOk: value.length >= 3
+    });
+    console.log('handleLoginUsernameInputChange value', value.length)
+  }
+  handleLoginPasswordInputChange = (event) => {
+    let value = event.target.value;
+    this.setState({
+      passwordOk: value.length >= 6
+    });
+  }
+
+  handleRegisterPasswordInputChange = (event) => {
+    let value = event.target.value;
+    let passEl = document.getElementById('register-password-input');
+    this.setState({
+      passwordOk: value >= 3,
+      passwordsMatch: value === passEl.value
+    });
+  }
+  handleRepeatPasswordInputChange = (event) => {
+    let value = event.target.value;
+    let passEl = event.target.previousSibling;
+    this.setState({
+      passwordOk: passEl.value.length >= 6,
+      passwordsMatch: value === passEl.value
+    });
+  }
+  handleRegisterUsernameInputChange = (event) => {
+    let value = event.target.value;
+    this.setState({
+      usernameOk: value.length >= 3
+    });
+    console.log('value', value)
+  }
+  handleClickCloseRegister = (event) => {
+    // document.getElementById('login-shade').classList.remove('showing');
+    this.setState({
+      loginAction: null
+    });
+  }
+  handleClickCallLogin = (event) => {
+    this.setState({
+      loginAction: 'loggingIn'
+    });
+  }
+  attemptLogin = (userValue, passValue, sessionID) => {
+    return new Promise((resolve, reject) => {
+      let userField = document.getElementById('login-username-input');
+      let passField = document.getElementById('login-password-input');
+      logUserIn(userValue, passValue, sessionID).then(response => {
+        console.log('attemptLogin > logUserIn responded', response)
+        if (response.data) {
+          if (response.data.username) {
+            let newRuleData = { ...this.state.ruleData };
+            newRuleData.rulesetIndexes = JSON.parse(response.data.rulesets);
+            console.log('got', response.data);
+            if (!sessionID) {
+              sessionID = response.data.sessionID
+            }
+            if (this.state.saveCookie) {
+              let localData = {
+                username: response.data.username,
+                sessionID: sessionID
+              };
+              console.log('locaData prepared as', localData)
+              setCookie('namecreator', localData, 365);
+            }
+            this.setState({
+              loginAction: null,
+              userLoggedIn: true,
+              username: response.data.username,
+              userID: parseInt(response.data.id),
+              ruleData: newRuleData,
+              titleText: `Logged in as ${response.data.username}`,
+            }, () => {
+                this.showMessage(`Logged in as ${response.data.username}`, 1600)
+                resolve('shitballs');
+            });
+            console.log('newRuleData',newRuleData)
+          } else if (response.data === 'badUsername') {
+            userField.style.color = 'red';
+            userField.value = 'USER NOT FOUND';
+            setTimeout(() => {
+              userField.style.color = 'black';
+              userField.value = '';
+            }, 1600);
+          } else if (response.data === 'badPassword') {
+            passField.style.color = 'red';
+            passField.style.fontSize = 'var(--medium-font-size)';
+            passField.type = 'text';
+            passField.value = 'INCORRECT PASSWORD';
+            setTimeout(() => {
+              passField.type = 'password';
+              passField.style.fontSize = 'initial';
+    
+              passField.style.color = 'black';
+              passField.value = '';
+            }, 1600);
+          }
+        }
+      });
+    });
+  }
+  handleClickRegisterLogin = (event) => {
+    let username = document.getElementById('register-username-input').value;
+    let pass = document.getElementById('register-password-input').value;
+    let sessionID = null;
+    if (this.state.saveCookie) {
+      sessionID = uuid();
+    }
+    createNewUser(username, pass, sessionID).then(response => {
+      console.warn('createNewUser response.data:', response.data);
+      if (response.data === 'nameTaken') {
+        let field1 = document.getElementById('register-username-input');
+        field1.style.color = 'red';
+        field1.value = 'NAME UNAVAILABLE';
+        setTimeout(() => {
+          field1.style.color = 'black';
+          field1.value = '';
+        }, 1600);
+      } else {
+        if (this.state.saveCookie) {
+          let localData = {
+            username: username,
+            sessionID: sessionID
+          };
+          console.log('locaData prepared at handleClickRegisterLogin as', localData)
+          setCookie('namecreator', localData, 365);
+        }
+        this.setState({
+          loginAction: null,
+          userLoggedIn: true,
+          username: username,
+          userID: response.data,
+          
+        });
+      }
+    });
+    event.preventDefault();
+  }
+  handleClickSubmitLogin = (event) => {    
+    console.info(this.state);
+    let field1 = document.getElementById('login-username-input');
+    let field2 = document.getElementById('login-password-input');
+    let sessionID = null;
+    if (this.state.cookieID) {
+      sessionID = this.state.cookieID;
+    }
+    this.attemptLogin(field1.value, field2.value, sessionID);
+    event.preventDefault();
+  }
+  handleClickLogOut = (event) => {
+    this.setState({
+      statusText: 'not logged in',
+      userLoggedIn: false,
+      cookieRecognized: false,
+      cookieID: null,
+      loginAction: null,
+      username: 'Guest',
+      userID: null
+    });
+    destroyCookie();
+  }
+  handleToggleSaveCookie = (event) => {
+    this.setState({
+      saveCookie: !this.state.saveCookie
+    })
+  }
+
   render() {
     let featuredName;
     let ruleData = this.state.ruleData;
@@ -1006,35 +1614,79 @@ class App extends Component {
             <div id='view-container'>
               {this.state.dataReady && (
               <>
-                <div id='indicator-container'><div id='save-indicator'>Cocks</div></div>
-                  <RulesScreen location={location} onClickEdit={this.handleClickEdit} onClickDeleteString={this.handleClickDeleteString} onClickAdd={this.handleClickAdd} selectedString={this.state.selectedString} onClickBack={this.handleClickBack} onClickWordPiece={this.handleClickWordPiece} onClickChangeRuleset={this.handleClickChangeRuleset} onClickBack={this.handleClickBack} ruleData={this.state.ruleData}
-                    feedbackTypesSelected={this.state.feedbackTypesSelected}
-                    feedbackTypesDiscovered={this.state.feedbackTypesDiscovered}
-                    onClickFeedback={this.handleClickFeedback} 
-                    onClickSendFeedback={this.handleClickSendFeedback}
-                    onEnterLetter={this.handleEnterLetter} />
-                  <HistoryScreen location={location} nameEditing={this.state.nameEditing} selectedString={this.state.selectedString} onClickName={this.handleClickName} namesList={this.state.productionData.namesList} onClickBack={this.handleClickBack} onClickGenerateMore={this.handleClickGenerate} onclickClearList={this.handleClearList} />
-                  <Route path='/rules' render={() => <RulesetSelect location={location} onChooseNewRuleset={this.handleChooseNewRuleset} onSelectRuleset={this.handleSelectRuleset} onDismissRulesetSelect={this.handleDismissRulesetSelect} ruleData={this.state.ruleData} />} />
-                  <FeedbackWindow
-                    showing={this.state.feedbackMode}
-                    location={location}
-                    selectedLetters={this.state.selectedLetters}
-                    onClickLetter={this.handleClickLetter}
-                    feedbackTypesSelected={this.state.feedbackTypesSelected}
-                    feedbackTypesDiscovered={this.state.feedbackTypesDiscovered}
-                    onClickFeedback={this.handleClickFeedback}
-                    onClickSendFeedback={this.handleClickSendFeedback}
-                    onClickBack={this.handleClickBack}
-                    ruleData={this.state.ruleData}
-                    nameData={this.state.nameEditing} />                                                                        
+                <div id='indicator-container'><div id='save-indicator'></div></div>
+                <RulesScreen location={location} userLoggedIn={this.state.userLoggedIn} username={this.state.username} userID={this.state.userID} onClickEdit={this.handleClickEdit} onClickDeleteString={this.handleClickDeleteString} onClickAdd={this.handleClickAdd} selectedString={this.state.selectedString} onClickBack={this.handleClickBack} onClickWordPiece={this.handleClickWordPiece} onClickChangeRuleset={this.handleClickChangeRuleset} onClickBack={this.handleClickBack} ruleData={this.state.ruleData}
+                  feedbackTypesSelected={this.state.feedbackTypesSelected}
+                  feedbackTypesDiscovered={this.state.feedbackTypesDiscovered}
+                  setFeedbackMode={this.setFeedbackMode}
+                  onClickFeedback={this.handleClickFeedback}
+                  onClickSendFeedback={this.handleClickSendFeedback}
+                  onClickLogIn={this.handleClickLogIn}
+                  onClickRegister={this.handleClickRegister}
+                  onClickLogOut={this.handleClickLogOut}
+                  saveCookie={this.state.saveCookie}
+                  onClickCallLogin={this.handleClickCallLogin}
+                  onClickCallRegister={this.handleClickCallRegister}
+                />
+                <HistoryScreen location={location} nameEditing={this.state.nameEditing} selectedString={this.state.selectedString} onClickName={this.handleClickName} namesList={this.state.productionData.namesList} onClickBack={this.handleClickBack} onClickGenerateMore={this.handleClickGenerate} onclickClearList={this.handleClearList} />
+                <Route path='/rules' render={() =>
+                  <>
+                    <RulesetSelect
+                      location={location}
+                      onChooseNewRuleset={this.handleChooseNewRuleset}
+                      onSelectRuleset={this.handleSelectRuleset}
+                      onDismissRulesetSelect={this.handleDismissRulesetSelect}
+                      rulesets={this.state.ruleData.rulesets}
+                      usingRuleset={this.state.ruleData.usingRuleset}
+                      rulesetSelected={this.state.ruleData.rulesetSelected}
+                      userID={this.state.userID}
+                    />                  
                   </>
-                )}
-                <NameDisplay location={location} progress={this.state.loadingProgress} dataReady={this.state.dataReady} fingerDown={this.state.fingerData.fingerDown} onClickName={this.handleClickName} nameData={featuredName} bulkMode={this.state.bulkMode} />
-                <ButtonArea currentNameStyle={this.state.currentNameStyle} readyToGenerate={this.state.dataReady} blockMode={this.state.blockMode} bulkMode={this.state.bulkMode} simpleMode={this.state.simpleMode} rejectedMode={this.state.rejectedMode} onChangeStyle={this.handleChangeStyle} onChangeMode={this.handleChangeMode} onClickGenerate={this.handleClickGenerate} />
-                <TitleBar titleText={'Name Generator'} statusText={this.state.statusText} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />
-              </div>
+                } />
+                <FeedbackWindow
+                  showing={this.state.feedbackMode}
+                  location={location}
+                  selectedLetters={this.state.selectedLetters}
+                  selectedString={this.state.selectedString}
+                  onClickLetter={this.handleClickLetter}
+                  feedbackTypesSelected={this.state.feedbackTypesSelected}
+                  feedbackTypesDiscovered={this.state.feedbackTypesDiscovered}
+                  currentEditType={this.state.currentEditType}
+                  onClickFeedback={this.handleClickFeedback}
+                  onClickInput={this.handleClickInput}
+                  onClickWordUnit={this.handleClickWordUnit}
+                  onEnterLetter={this.handleEnterLetter}
+                  onClickSendFeedback={this.handleClickSendFeedback}
+                  onClickBack={this.handleClickBack}
+                  onClickLogOut={this.handleClickLogOut}
+                  ruleData={this.state.ruleData}
+                  nameData={this.state.nameEditing}                  
+                />
+                <LoginWindow
+                    location={location}
+                    mode={this.state.loginAction}
+                    onRegisterUsernameInputChange={this.handleRegisterUsernameInputChange}
+                    onRegisterPasswordInputChange={this.handleRegisterPasswordInputChange}
+                    onRepeatPasswordInputChange={this.handleRepeatPasswordInputChange}
+                    onLoginUsernameInputChange={this.handleLoginUsernameInputChange}
+                    onLoginPasswordInputChange={this.handleLoginPasswordInputChange}
+                    onClickRegisterLogin={this.handleClickRegisterLogin}
+                    onClickSubmitLogin={this.handleClickSubmitLogin}
+                    onToggleSaveCookie={this.handleToggleSaveCookie}
+                    saveCookie={this.state.saveCookie}
+                    onClickCloseRegister={this.handleClickCloseRegister}
+                    usernameOk={this.state.usernameOk}
+                    passwordOk={this.state.passwordOk}
+                    passwordsMatch={this.state.passwordsMatch}
+                  />
+              </>
             )}
-          />
+            <NameDisplay location={location} progress={this.state.loadingProgress} dataReady={this.state.dataReady} fingerDown={this.state.fingerData.fingerDown} onClickName={this.handleClickName} nameData={featuredName} bulkMode={this.state.bulkMode} />
+            <ButtonArea currentNameStyle={this.state.currentNameStyle} readyToGenerate={this.state.dataReady} blockMode={this.state.blockMode} bulkMode={this.state.bulkMode} simpleMode={this.state.simpleMode} rejectedMode={this.state.rejectedMode} onChangeStyle={this.handleChangeStyle} onChangeMode={this.handleChangeMode} onClickGenerate={this.handleClickGenerate} />
+            <TitleBar userLoggedIn={this.state.userLoggedIn} titleText={this.state.titleText} statusText={this.state.statusText} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />
+          </div>
+        )}
+        />
       </>
     );
   }

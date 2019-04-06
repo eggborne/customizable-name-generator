@@ -18,6 +18,9 @@
 
   --list-padding: 4vw;
   --footer-color: #151515;
+
+  --button-border-width: 0.25rem;
+  --button-border-radius: 2vmin;
   
   --button-border-color: rgb(9, 52, 9);
   --pressed-button-border-color: rgb(9, 52, 9);
@@ -57,13 +60,41 @@ body {
 h3 {
   font-weight: normal;
 }
+form {
+  padding: 0;
+  margin: 0;
+}
 .double-button {
   grid-column-start: 0;
   grid-column-end: span 2;
   width: 100%;
 }
+.large-input {
+  font-family: 'Nova Square';
+  line-height: 100%;
+  background: transparent;
+  color: white;
+  font-size: var(--name-font-size);
+  /* width: calc(var(--name-font-size) * 4); */
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border-style: solid;
+  border: 0.26vh solid var(--button-border-color);
+  border-radius: 1vw;    
+}
+.large-input::placeholder {
+  color: rgb(69, 69, 69);
+}
+.large-input:focus::placeholder {
+  color: transparent
+}
+.medium-input:focus::placeholder {
+  color: transparent
+}
 #view-container { 
-  background: #060e02;
+  /* background: #060e02; */
+  background: black;
   height: 100%;
   width: 100vw;
   /* display: flex;
@@ -82,9 +113,6 @@ h3 {
   flex-grow: 0.7;
   grid-template-columns: 1fr;
   grid-template-rows: min-content min-content min-content 0.5fr;
-  /* grid-template-rows: 31% 18% 0.45fr 0.25fr; */
-  /* grid-template-rows: 0.33fr 0.22fr 0.28fr 0.14fr; */
-  /* align-content: space-between; */
   align-content: start;
   grid-row-gap: 2vh;
   transition: opacity 105ms ease;
@@ -97,7 +125,6 @@ h3 {
   grid-column-end: span 3;
   color: rgb(76, 76, 76);
   font-size: var(--small-font-size);
-  /* padding-bottom: 1vw; */
   justify-self: center;
   align-self: end;
   line-height: 100%;
@@ -236,14 +263,6 @@ h3 {
 .lower-nav-panel.floating {
   grid-template-columns: 40% 1fr;
 }
-.feedback-button-area {
-  width: 100%;
-  flex-grow: 1;
-  display: grid;
-  grid-template-columns: 1fr; 
-  grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-  grid-row-gap: 1vh;
-}
 /* .lower-nav-panel button.bottom-nav {
   height: 7vh;
   justify-content: center;
@@ -325,13 +344,6 @@ h2 {
   align-items: center;
   justify-content: space-around;
   width: 100%;
-}
-#invalid-string-input {
-  text-align: center;
-  margin: 1rem;
-  font-size: 1.5rem;
-  font-family: var(--secondary-font);
-  display: none;
 }
 .debug-on {
   background: rgb(19, 1, 1);

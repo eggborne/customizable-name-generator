@@ -17,6 +17,7 @@
   transition: transform 210ms ease, opacity 210ms ease;
   overflow: auto;
   scroll-behavior: smooth;
+  --header-login-width: 70vw;
 }
 a {
   text-decoration: none;
@@ -89,6 +90,106 @@ a {
   font-size: var(---medium-font-size);
   width: 90%;
   height: 3.5rem;
+}
+#rules-screen .title-header {
+  height: 11vh;
+  padding-top: 1vh;
+  padding-bottom: 0.5vh;
+  padding-right: var(--list-padding);
+  display: grid;
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: 1fr 1fr;
+  justify-items: end;
+  align-items: space-between;
+}
+#rules-screen #rules-title-text {
+  grid-row-start: 0;
+  grid-row-end: span 2;
+  height: 100%;
+  margin-right: 3vw;
+  margin-top: 1vh;
+}
+#rules-title.title-header .title-info {
+  display: flex;
+  align-items: center;
+  background: #222;
+  height: 75%;
+  padding: 1vw;
+  padding-left: 3vw;
+  padding-right: 3vw;
+  border-radius: 0.25vh;
+
+}
+#login-header-area {
+  width: var(--header-login-width);
+  font-size: var(--small-font-size);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;  
+  transition: background 400ms ease;
+  transition-delay: 210ms;
+}
+#login-input-area {
+  display: flex;
+  width: 100%;
+}
+.title-header #login-header-area div {
+  /* transition: transform 210ms ease; */
+  transition: transform 210ms ease;
+}
+.title-header #login-header-area button {
+  /* transition: transform 210ms ease; */
+  transition: background-color 400ms ease, width 50ms ease;
+}
+#login-header-area .mini-input {
+  font-family: 'Nova Square';
+  font-size: var(--small=font-size);
+  height: var(--large-font-size);
+  width: 50%;
+  margin-left: 1vw;
+}
+#login-header-area #login-instructions {
+  opacity: 0.75
+}
+#login-header-area #login-instructions.logged-in {
+ color: rgb(112, 204, 112);
+ font-size: var(--medium-font-size);
+}
+/* #login-header-area.logging-in #login-instructions::after {
+  opacity: 0;
+} */
+#login-header-area #log-out-button {
+  min-width: calc(var(--base-font-size) * 3);
+}
+#login-header-area.logged-in > #login-button {
+  background-color: var(--danger-button-color);
+  border-color: var(--danger-button-border-color);
+}
+#login-header-area.logging-in > #login-button {
+  background-color: var(--special-button-color);
+  border-color: var(--button-border-color);
+}
+#log-in-button, #register-button {
+  margin-left: 2vw;
+  height: 4vh;
+  min-width: 16vw;  
+  font-size: var(--medium-font-size);
+  margin-left: 2vw;
+}
+#log-in-button, #log-out-button {
+  min-width: 16vw;
+  height: 4vh;
+}
+#log-out-button {
+  background-color: var(--danger-button-color);
+  border-color: var(--danger-button-border-color);
+  margin-left: 2vw;
+  font-size: var(--medium-font-size);
+}
+#register-button {
+  background-color: var(--warning-button-color);
+  border-color: var(--warning-button-border-color);
+  font-size: calc(var(--small-font-size) / 1.2);
 }
 .list-container {
   position: relative;
@@ -169,6 +270,29 @@ a {
   padding: 1vh;
   flex-wrap: wrap;
 }
+.follower-selection-area {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-items: center;
+  align-items: center;
+  font-size:var(--medium-font-size);
+  border: 0.25vh solid rgb(56, 53, 53);
+  padding: 1vh;
+  margin-top: 3vh;
+  flex-wrap: wrap;
+}
+#follower-inputs > input {
+  /* height: 12vh; */
+}
+#follower-inputs {
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* justify-content: center; */
+  /* background: skyblue; */
+  /* height: 20vh; */
+}
 .invalid-word, .invalid-word.word-piece {
   /* position: relative; */
   transition: transform 210ms ease;
@@ -243,14 +367,25 @@ a {
 .valid-length-list:last-of-type {
   margin-bottom: 0;
 }
-#rules-screen .none-message {
-  font-family: sans-serif;
-  font-size: calc(var(--small-font-size));
-  /* width: calc(var(--small-font-size) * 4); */
-  padding-left: 1vw;
-  padding-right: 1vw;
+.x-button {
+  position: relative;
+  font-family: monospace;  
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 4vh;
+  height: 4vh;
+  top: 1vh;
+  right: 1vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0.5
+  background-color: var(--danger-button-color);
+  border: var(--button-border-width) solid var(--danger-button-border-color);
+  border-radius: 1vmin;
+}
+.x-button i {
+  margin: 0;
+  padding: 0;
+  font-size: var(--base-font-size);
 }

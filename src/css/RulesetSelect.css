@@ -39,6 +39,7 @@
 }
 #ruleset-title {
   justify-content: center;
+  pointer-events: none;
 }
 /* #ruleset-select-screen .lower-nav-panel.floating {
   grid-template-columns: 40% 1fr;
@@ -53,11 +54,21 @@
 #choose-ruleset-button {
   width: 46vw;
 } */
-.ruleset-listing > div {
+.ruleset-listing > * {
   pointer-events: none;
 }
 .ruleset-listing > div:nth-child(2n) {
   justify-self: end;
+}
+.ruleset-listing.owned {
+  outline: 0.5vh solid rgb(183, 229, 160);
+}
+.ruleset-listing.owned #ruleset-creator-credit {
+  color: white;
+}
+.ruleset-listing.owned #ruleset-creator-credit::after {
+  content: ' (you!)';
+  white-space: pre;
 }
 .ruleset-listing {
   border-radius: 0.5vh;
@@ -75,6 +86,10 @@
   align-content: space-between;
   grid-row-gap: 1vh;
   transition: background-color 210ms ease;
+}
+.ruleset-listing.owned:after {
+  color: yellow;
+  content: 'EDITABLE!';
 }
 .ruleset-info {
   font-size: var(--small-font-size);

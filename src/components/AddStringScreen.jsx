@@ -10,7 +10,6 @@ function AddStringScreen(props) {
   if (props.location) {
     shadeClass = props.location.location.pathname === '/addrule' ? 'shade showing' : 'shade';
     windowClass = props.location.location.pathname === '/addrule' ? 'floating-window' : 'floating-window hidden';
-
   } else {    
     shadeClass = 'shade';
     windowClass = 'floating-window-hidden';

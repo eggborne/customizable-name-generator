@@ -62,9 +62,7 @@ const releaseButton = (event) => {
   fingerDown = false;
   let timeSince = Date.now() - fingerDownAt;
   let buttonEl = event.target;
-  console.log('up',event.pointerId)
   if (timeSince > swapSpeed * 2) {
-    console.error('up', timeSince, swapSpeed * 2)
     buttonEl.classList.remove('pressed');
   }
 }
@@ -99,6 +97,6 @@ function Button(props) {
   );
 }
 const isEqual = (prevProps, nextProps) => {
-  return prevProps.selected == nextProps.selected && prevProps.label == nextProps.label && prevProps.disabled == nextProps.disabled && prevProps.discovered == nextProps.discovered && prevProps.unavailable == nextProps.unavailable;
+  return prevProps.className == nextProps.className && prevProps.selected == nextProps.selected && prevProps.label == nextProps.label && prevProps.disabled == nextProps.disabled && prevProps.discovered == nextProps.discovered && prevProps.unavailable == nextProps.unavailable;
 }
 export default React.memo(Button, isEqual);

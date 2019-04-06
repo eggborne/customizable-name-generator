@@ -1,8 +1,6 @@
-
-
 import React from 'react';
- // eslint-disable-next-line
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+// eslint-disable-next-line
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Button from './Button';
 import FeedbackButtonSelection from './FeedbackButtonSelection';
 import '../css/Button.css';
@@ -11,7 +9,7 @@ import '../css/FeedbackWindow.css';
 import { namePatterns } from '../js/namegenerator.js';
 
 function FeedbackWindow(props) {
-  console.error('rendering FeedbackWindow!!', props);
+  console.error('rendering FeedbackWindow!!', props.showing);
 
   requestAnimationFrame(() => {
     // [...document.querySelectorAll('.name-letter')].map(word => {
@@ -29,96 +27,145 @@ function FeedbackWindow(props) {
     //   console.log('moved on', event.target)
     // });
   });
-
   let names = [[''], ['']];
-  if (props.nameData && props.nameData.wordUnits) {
-    names = [];
-    for (let wordType in props.nameData.wordUnits) {
-      names.push([]);
-      let word = props.nameData.wordUnits[wordType];
-      word.map(unit => {
-        names[names.length - 1].push(unit);      
-      })
-    };
-  }
   let types = [];
   let article = '';
   let longestWord = 0;
-  requestAnimationFrame(() => {
-    [...document.querySelectorAll('.name-letter')].map(letterEl => {
-      let width = (window.innerWidth * 0.68) / longestWord;
-      let fontSize = width * 0.75;
-      letterEl.style.fontSize = fontSize + 'px';
-      letterEl.style.width = width + 'px';
+  if (props.showing === 'editName') {
+    console.warn('showineditNamegNAme!!')
+    if (props.nameData && props.nameData.wordUnits) {
+      names = [];
+      for (let wordType in props.nameData.wordUnits) {
+        names.push([]);
+        let word = props.nameData.wordUnits[wordType];
+        word.map(unit => {
+          names[names.length - 1].push(unit);
+        });
+      }
+    }
+    requestAnimationFrame(() => {
+      [...document.querySelectorAll('.name-letter')].map(letterEl => {
+        let width = (window.innerWidth * 0.68) / longestWord;
+        let fontSize = width * 0.75;
+        letterEl.style.fontSize = fontSize + 'px';
+        letterEl.style.width = width + 'px';
+      });
     });
-  });
+  }
   let selectedString = '';
   let selectedIds = [];
   props.selectedLetters.map(letterObj => {
     selectedString += letterObj.char;
-    selectedIds.push(letterObj.id)
-  })  
+    selectedIds.push(letterObj.id);
+  });
+
+  let inputPlaceholder = '';
+  let inputValue = '';
+  if (props.showing === 'enter') {
+    inputPlaceholder = 'enter letters'
+  }
+  if (props.showing === 'editString') {
+    inputValue = props.selectedString;
+  }
+  let typeClass = props.showing;
+  if (typeClass === 'editString') {
+    typeClass = 'enter';
+  }
   return (
-    <div id='feedback-shade' className={props.showing ? 'shade showing' : 'shade'}>
-      <div id='feedback-info-message'>Select letters to edit rules</div>                 
-      <div className={props.showing ? 'floating-window' : 'floating-window hidden'} id='feedback-panel'>        
-        <div id='feedback-title'>
-          {names.map((name, n) => {
-            if (name.slice(name.length - 4, name.length).join('') === ' the') {
-              article = 'the';
-              name = name.slice(0, name.length - 4);              
-            }
-            let pattern;
-            types[n] = [];
-            if (namePatterns[props.nameData.style]) {
-              pattern = Object.values(namePatterns[props.nameData.style]);
-            }
-            longestWord = (name.join('').length > longestWord) ? name.join('').length : longestWord;
-            return <><div key={n}>
-              {name.map((unit, i) => {
-                unit = unit.toUpperCase();
-                let unitClass = '';
-                let unitType = '';
-                if (props.nameData.style) {
-                  unitType = pattern[n][i];
-                  unitClass = pattern[n][i].type;
-                  if (unitType.type === 'repeater') {
-                    // console.log(unitType.value);
-                    // console.info(types);
-                    // console.info(types[n]);
-                    // console.info(types[n][1])
-                    unitClass = types[n][unitType.value].type + ' repeater';
-                  }
-                  if (unit === ' ') {
-                    unitClass += ' space';
-                  }
-                }
-                types[n].push(unitType);                
-                return <div key={i} className={unitClass + ' name-unit'}>{
-                  unit.split('').map((letter, l) => {
-                    let letterId = `name-letter-word-${n}-unit-${i}-char-${l}`;
-                    let letterClass = 'name-letter';                    
-                    if (selectedIds.includes(letterId)) {
-                      letterClass += ' selected';
-                    }
-                    let clickAction = letter !== ' ' && letter !== '-' ? props.onClickLetter : () => null;
-                    return <div key={l} id={letterId} className={letterClass} onPointerDown={clickAction}>{letter}</div>;
-                  })
-                }</div>
-              })
-            }
+    <div id='feedback-shade' className={typeClass ? 'shade showing' : 'shade'}>
+      {props.showing === 'editName' && <div id='feedback-info-message'>Select letters to edit rules</div>}
+      <div className={props.showing ? `${typeClass} floating-window` : `${typeClass} floating-window hidden`} id='feedback-panel'>
+        {props.showing === 'editName' && (
+          <div id='feedback-title'>
+            {names.map((name, n) => {
+              if (name.slice(name.length - 4, name.length).join('') === ' the') {
+                article = 'the';
+                name = name.slice(0, name.length - 4);
+              }
+              let pattern;
+              types[n] = [];
+              if (namePatterns[props.nameData.style]) {
+                pattern = Object.values(namePatterns[props.nameData.style]);
+              }
+              longestWord = name.join('').length > longestWord ? name.join('').length : longestWord;
+              return (
+                <>
+                  <div key={n}>
+                    {name.map((unit, i) => {
+                      unit = unit.toUpperCase();
+                      let unitClass = '';
+                      let unitType = '';
+                      if (props.nameData.style) {
+                        unitType = pattern[n][i];
+                        unitClass = pattern[n][i].type;
+                        if (unitType.type === 'repeater') {
+                          // console.log(unitType.value);
+                          // console.info(types);
+                          // console.info(types[n]);
+                          // console.info(types[n][1])
+                          unitClass = types[n][unitType.value].type + ' repeater';
+                        }
+                        if (unit === ' ') {
+                          unitClass += ' space';
+                        }
+                      }
+                      types[n].push(unitType);
+                      return (
+                        <div key={i} className={unitClass + ' name-unit'}>
+                          {unit.split('').map((letter, l) => {
+                            let letterId = `name-letter-word-${n}-unit-${i}-char-${l}`;
+                            let letterClass = 'name-letter';
+                            if (selectedIds.includes(letterId)) {
+                              letterClass += ' selected';
+                            }
+                            let clickAction = letter !== ' ' && letter !== '-' ? props.onClickLetter : () => null;
+                            return (
+                              <div key={l} id={letterId} className={letterClass} onPointerDown={clickAction}>
+                                {letter}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <div id='feedback-article'>{n === 0 && `${article}`}</div>
+                </>
+              );
+            })}
+          </div>
+        )}
+        {props.currentEditType === 'invalidFollowers' &&
+          <>
+            <div>
+              <div className='follower-selection-area'>
+                {Object.keys(props.ruleData.invalidFollowers).map((preceder, p) => {
+                  let elementID = `followers-selection-list-${p}`;
+                  return (
+                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
+                      {preceder}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-              <div id='feedback-article'>{n === 0 && `${article}`}</div>
-            </>
-          })}
-        </div>
-        <input id='invalid-string-input' placeholder='Enter letters' type='text' name='invalid-string' />
-        <div id='feedback-selected-display'>{selectedString}</div>      
-        <FeedbackButtonSelection
-          feedbackTypesSelected={props.feedbackTypesSelected}
-          feedbackTypesDiscovered={props.feedbackTypesDiscovered}
-          onClickFeedback={props.onClickFeedback}
-          selectedLetters={props.selectedLetters}/>
+            {/* <div id='follower-inputs'> */}
+              <div id='feedback-selected-display'>
+                <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' class='large-input' id='submit-preceder-input'></input>
+              </div>
+              <div>must never be followed by</div>
+              <div id='feedback-selected-display'>
+                <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' class='large-input' id='submit-follower-input'></input>
+              </div>
+            {/* </div> */}
+          </>
+        }
+        {props.currentEditType !== 'invalidFollowers' &&                      
+          <div id='feedback-selected-display'>
+            <input value={selectedString} onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={inputPlaceholder} type='text' className='large-input'  id='submit-string-input'></input>
+          </div>
+        }        
+        <FeedbackButtonSelection className={typeClass} currentEditType={props.currentEditType} feedbackTypesSelected={props.feedbackTypesSelected} feedbackTypesDiscovered={props.feedbackTypesDiscovered} onClickFeedback={props.onClickFeedback} selectedLetters={props.selectedLetters} />
         <div id='feedback-footer' className='lower-nav-panel floating'>
           <Button onClick={props.onClickBack} label={'EXIT'} type='close-feedback' className='bottom-nav nav-link cancel-button' />
           <Button disabled={!props.feedbackTypesSelected.length} onClick={props.onClickSendFeedback} label={'SUBMIT'} type='submit-feedback' className='bottom-nav nav-link' />
@@ -128,13 +175,12 @@ function FeedbackWindow(props) {
   );
 }
 const isEqual = (prevProps, nextProps) => {
-  let equalTest = (prevProps.showing === nextProps.showing
-    && prevProps.selectedLetters.length === nextProps.selectedLetters.length
-    && prevProps.feedbackTypesSelected.length === nextProps.feedbackTypesSelected.length
-    && prevProps.feedbackTypesDiscovered.length === nextProps.feedbackTypesDiscovered.length
-
-  );
+  if (!prevProps.showing && nextProps.showing && nextProps.showing === 'editString') {
+    console.log('COOCKCKCKC -----------------------------------')
+    setTimeout(() => { document.getElementById('submit-string-input').value = nextProps.selectedString.string }, 1);    
+  }
+  let equalTest = prevProps.showing === nextProps.showing && prevProps.selectedLetters.length === nextProps.selectedLetters.length && prevProps.feedbackTypesSelected.length === nextProps.feedbackTypesSelected.length && prevProps.feedbackTypesDiscovered.length === nextProps.feedbackTypesDiscovered.length;
   return equalTest;
-}
+};
 
 export default React.memo(FeedbackWindow, isEqual);

@@ -15,7 +15,8 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
     "tinygesture": "^1.1.4",
-    "typescript": "^3.3.3333"
+    "typescript": "^3.3.3333",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

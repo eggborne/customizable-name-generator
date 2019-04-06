@@ -49,25 +49,4 @@
   margin-bottom: 11vh;
   padding: 2vh;
 }
-#submit-string-input {
-  font-family: 'Nova Square';
-  line-height: 100%;
-  background: black;
-  color: white;
-  font-size: var(--name-font-size);
-  /* width: calc(var(--name-font-size) * 4); */
-  width: 100%;
-  height: calc(var(--name-font-size) * 1.5);
-  text-align: center;
-  border-style: solid;
-  border: 0.26vh solid var(--button-border-color);
-  border-radius: 1vw;
-  margin: 1vh;
-  margin-bottom: 3vh;
-}
-#submit-string-input::placeholder {
-  color: gray;
-}
-#submit-string-input:focus::placeholder {
-  color: transparent
-}
+
