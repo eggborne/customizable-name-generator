@@ -4,7 +4,7 @@ import '../css/Button.css';
 import '../css/AddStringScreen.css';
 
 function AddStringScreen(props) {
-  console.error('rendering AddStringScreen!!', props.location.location.pathname);
+  // console.error('rendering AddStringScreen!!', props.location.location.pathname);
   let shadeClass;
   let windowClass;
   if (props.location) {

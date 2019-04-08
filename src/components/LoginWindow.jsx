@@ -6,7 +6,7 @@ import '../css/Button.css';
 import '../css/LoginWindow.css';
 
 function LoginWindow(props) {
-  console.error('rendering LoginWindow!!', props);
+  // console.error('rendering LoginWindow!!', props);
   if (props.mode !== null) {
     setTimeout(() => {
       if (document.getElementById('login-window')) {
@@ -20,15 +20,10 @@ function LoginWindow(props) {
   }
   let buttonClass = 'balls';
   if (!fieldsOk) {
-    console.warn('SETING BUTTON TO DISABLED!!! ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
     buttonClass = 'disabled';
   } else {
-    buttonClass = 'fuck motehr';
+    buttonClass = undefined;
   }
-  console.error('FIEDLS OK?', fieldsOk);
-  console.error('props.usernameOk OK?', props.usernameOk);
-  console.error('props.passwordOk OK?', props.passwordOk);
-  console.error('props.passwordsMatch OK?', props.passwordsMatch);
   return (
     <div id='login-shade' className={props.mode !== null ? 'shade showing' : 'shade'}>
       {props.mode === 'registering' &&
@@ -68,4 +63,4 @@ function LoginWindow(props) {
   );
 }
 
-export default LoginWindow;
+export default React.memo(LoginWindow);

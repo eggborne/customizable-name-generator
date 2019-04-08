@@ -5,15 +5,13 @@
 }
 #login-window {
   background: #191919;
-  width: 75vw;
-  /* height: 45vh; */
+  width: 80vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
   justify-self: start;
   opacity: 1;
-  /* padding-top: 3vh; */
   padding-bottom: 4vh;
   border-radius: var(--button-border-radius);
   transform: translateY(-25%);

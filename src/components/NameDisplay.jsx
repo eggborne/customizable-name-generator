@@ -7,7 +7,6 @@ const clickFunction = window.PointerEvent ? 'onPointerDown' : window.TouchEvent 
 let pressedAt = 0;
 let fingerDown = false;
 const hideName = () => {
-  console.error('hideName');
   if (!document.getElementById('main-button').classList.contains('unavailable')) {
     pressedAt = window.performance.now();
     document.getElementById('name-display').style.background = 'transparent';
@@ -31,7 +30,6 @@ const hideName = () => {
   }, swapSpeed * 2);
 };
 const showName = () => {
-  console.error('showName');
   fingerDown = false;
   if (window.performance.now() - pressedAt > swapSpeed * 2) {
     document.getElementById('name-display').classList.remove('not-showing');

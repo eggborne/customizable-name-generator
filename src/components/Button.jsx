@@ -35,7 +35,6 @@ const clickListeners = {
   },
 }
 const clickFunction = window.PointerEvent ? 'onPointerDown' : window.TouchEvent ? 'onTouchStart' : 'onMouseDown';
-console.log(clickFunction)
 const clickListener = clickListeners[clickFunction];
 let bounceTimeout;
 let fingerDownAt = 0;
@@ -43,7 +42,6 @@ let fingerDown = false;
 const pressButton = (event) => {
   let timeSince = Date.now() - fingerDownAt;
   let buttonEl = event.target;
-  console.log('down',event.pointerId)
   if (timeSince > swapSpeed * 2) {
     fingerDown = true;
     fingerDownAt = Date.now();

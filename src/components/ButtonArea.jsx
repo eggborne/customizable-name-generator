@@ -5,7 +5,7 @@ import Button from './Button.jsx';
 // import '../css/ButtonArea.css';
 
 function ButtonArea(props) {
-  console.error('rendering ButtonArea!!', props.readyToGenerate)
+  // console.error('rendering ButtonArea!!', props.readyToGenerate)
   return (    
     <div id='main-container'>
       <div id='style-select-area'>

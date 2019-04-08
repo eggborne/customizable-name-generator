@@ -2,7 +2,7 @@ import React from 'react';
 import Button from './Button';
 import '../css/Button.css';
 
-const unitTypes = ['consonantStarters', 'consonantEnders', 'vowelUnits']
+const unitTypes = ['onsets', 'codas', 'nuclei']
 function FeedbackButtonSelection(props) {
   
   console.error('FBS', props.currentEditType)
@@ -26,9 +26,9 @@ function FeedbackButtonSelection(props) {
       {(enterMode || editStringMode) && <>
         {unitTypes.includes(props.currentEditType) ?
           <>
-            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'startWord')} label={'...can start a syllable'} type='start-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('consonantStarters')} discovered={props.feedbackTypesDiscovered.includes('consonantStarters')} />
-            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'endWord')} label={'...can end a syllable'} type='end-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('consonantEnders')} discovered={props.feedbackTypesDiscovered.includes('consonantEnders')} />
-            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'midWord')} label={'...can appear as a vowel or vowel-like unit'} type='mid-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('vowelUnits')} discovered={props.feedbackTypesDiscovered.includes('vowelUnits')} />
+            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'startWord')} label={'...can start a syllable'} type='start-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('onsets')} discovered={props.feedbackTypesDiscovered.includes('onsets')} />
+            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'endWord')} label={'...can end a syllable'} type='end-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('codas')} discovered={props.feedbackTypesDiscovered.includes('codas')} />
+            <Button disabled={noneSelected} onClick={event => props.onClickFeedback(event, 'midWord')} label={'...can appear as a vowel or vowel-like unit'} type='mid-word' className='feedback-select-toggle' selected={!noneSelected && props.feedbackTypesSelected.includes('nuclei')} discovered={props.feedbackTypesDiscovered.includes('nuclei')} />
           </>
           :
           props.currentEditType === 'invalidFollowers' ? 

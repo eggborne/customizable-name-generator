@@ -88,8 +88,10 @@
   transition: background-color 210ms ease;
 }
 .ruleset-listing.owned:after {
+  font-size: var(--nav-font-size);
+  letter-spacing: 0.05rem;
   color: yellow;
-  content: 'EDITABLE!';
+  content: 'EDITABLE';
 }
 .ruleset-info {
   font-size: var(--small-font-size);

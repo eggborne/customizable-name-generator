@@ -1,6 +1,4 @@
 import React from 'react';
-// eslint-disable-next-line
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Button from './Button';
 import FeedbackButtonSelection from './FeedbackButtonSelection';
 import '../css/Button.css';
@@ -9,7 +7,7 @@ import '../css/FeedbackWindow.css';
 import { namePatterns } from '../js/namegenerator.js';
 
 function FeedbackWindow(props) {
-  console.error('rendering FeedbackWindow!!', props.showing);
+  // console.error('rendering FeedbackWindow!!', props.showing);
 
   requestAnimationFrame(() => {
     // [...document.querySelectorAll('.name-letter')].map(word => {
@@ -99,10 +97,6 @@ function FeedbackWindow(props) {
                         unitType = pattern[n][i];
                         unitClass = pattern[n][i].type;
                         if (unitType.type === 'repeater') {
-                          // console.log(unitType.value);
-                          // console.info(types);
-                          // console.info(types[n]);
-                          // console.info(types[n][1])
                           unitClass = types[n][unitType.value].type + ' repeater';
                         }
                         if (unit === ' ') {
@@ -137,9 +131,9 @@ function FeedbackWindow(props) {
         )}
         {props.currentEditType === 'invalidFollowers' &&
           <>
-            <div>
-              <div className='follower-selection-area'>
-                {Object.keys(props.ruleData.invalidFollowers).map((preceder, p) => {
+            {/* <div> */}
+            <div className='follower-selection-area'>
+                {props.ruleData.onsets.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
                   let elementID = `followers-selection-list-${p}`;
                   return (
                     <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
@@ -147,25 +141,41 @@ function FeedbackWindow(props) {
                     </div>
                   );
                 })}
-              </div>
-            </div>
-            {/* <div id='follower-inputs'> */}
-              <div id='feedback-selected-display'>
-                <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' class='large-input' id='submit-preceder-input'></input>
-              </div>
-              <div>must never be followed by</div>
-              <div id='feedback-selected-display'>
-                <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' class='large-input' id='submit-follower-input'></input>
+              <div style={{width: '100%', height: '1vh'}}></div>
+              {props.ruleData.nuclei.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
+                  let elementID = `followers-selection-list-${p}`;
+                  return (
+                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
+                      {preceder}
+                    </div>
+                  );
+              })}
+              <div style={{ width: '100%', height: '1vh' }}></div>
+              {props.ruleData.codas.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
+                  let elementID = `followers-selection-list-${p}`;
+                  return (
+                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
+                      {preceder}
+                    </div>
+                  );
+              })}
               </div>
             {/* </div> */}
+            <div id='follower-inputs'>
+              <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' className='large-input sequence0' id='submit-preceder-input'></input>
+              <div>will never be followed by</div>
+              <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' className='large-input red-border sequence1' id='submit-follower-input'></input>
+            </div>
           </>
         }
         {props.currentEditType !== 'invalidFollowers' &&                      
-          <div id='feedback-selected-display'>
-            <input value={selectedString} onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={inputPlaceholder} type='text' className='large-input'  id='submit-string-input'></input>
-          </div>
+          <>
+            <div id='feedback-selected-display'>
+              <input value={selectedString} onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={inputPlaceholder} type='text' className='large-input'  id='submit-string-input'></input>
+            </div>
+            <FeedbackButtonSelection className={typeClass} currentEditType={props.currentEditType} feedbackTypesSelected={props.feedbackTypesSelected} feedbackTypesDiscovered={props.feedbackTypesDiscovered} onClickFeedback={props.onClickFeedback} selectedLetters={props.selectedLetters} />
+          </>
         }        
-        <FeedbackButtonSelection className={typeClass} currentEditType={props.currentEditType} feedbackTypesSelected={props.feedbackTypesSelected} feedbackTypesDiscovered={props.feedbackTypesDiscovered} onClickFeedback={props.onClickFeedback} selectedLetters={props.selectedLetters} />
         <div id='feedback-footer' className='lower-nav-panel floating'>
           <Button onClick={props.onClickBack} label={'EXIT'} type='close-feedback' className='bottom-nav nav-link cancel-button' />
           <Button disabled={!props.feedbackTypesSelected.length} onClick={props.onClickSendFeedback} label={'SUBMIT'} type='submit-feedback' className='bottom-nav nav-link' />
@@ -175,8 +185,7 @@ function FeedbackWindow(props) {
   );
 }
 const isEqual = (prevProps, nextProps) => {
-  if (!prevProps.showing && nextProps.showing && nextProps.showing === 'editString') {
-    console.log('COOCKCKCKC -----------------------------------')
+  if (!prevProps.showing && nextProps.showing && nextProps.showing === 'editString') {    
     setTimeout(() => { document.getElementById('submit-string-input').value = nextProps.selectedString.string }, 1);    
   }
   let equalTest = prevProps.showing === nextProps.showing && prevProps.selectedLetters.length === nextProps.selectedLetters.length && prevProps.feedbackTypesSelected.length === nextProps.feedbackTypesSelected.length && prevProps.feedbackTypesDiscovered.length === nextProps.feedbackTypesDiscovered.length;

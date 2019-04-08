@@ -286,6 +286,9 @@ h2 {
   border-radius: 0.1rem;
   border-bottom: 0;
 }
+.red-border {
+  border-color: rgb(54, 0, 0);
+}
 .hidden {
   opacity: 0;
 }

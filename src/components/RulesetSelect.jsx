@@ -36,7 +36,8 @@ function RulesetSelect(props) {
           {rulesets.length ? (
             <>
               {rulesets
-                .filter(ruleset => !ruleset.creatorID.includes('backup'))
+                .filter(ruleset => !ruleset.dialect.includes('backup'))
+                .sort((a, b) => a.index - b.index)
                 .map((ruleset, i) => {
                   let rulesetSelected = parseInt(props.rulesetSelected);
                   let rulesetIndex = parseInt(ruleset.index);
@@ -44,14 +45,16 @@ function RulesetSelect(props) {
                   let highlighted = '';
                   let using = '';
                   let owned = '';
-                  console.warn('-----------------------------------------------------------------')
-                  console.warn('props.userID', props.userID)
-                  console.warn('props.usingRuleset', usingRuleset)
-                  console.warn('props.rulesetSelected', rulesetSelected)
-                  console.warn('ruleset.creatorID', ruleset.creatorID)
-                  console.warn('ruleset.index', rulesetIndex)
-                  console.warn('-----------------------------------------------------------------')
-                  if (props.userID == ruleset.creatorID) {
+                  let titleDisplay = `'${ruleset.dialect}'`;
+                  let creatorDisplay = ruleset.creator;
+                  // console.warn('-----------------------------------------------------------------')
+                  // console.warn('props.userID', props.userID)
+                  // console.warn('props.usingRuleset', usingRuleset)
+                  // console.warn('props.rulesetSelected', rulesetSelected)
+                  // console.warn('ruleset.creatorID', ruleset.creatorID)
+                  // console.warn('ruleset.index', rulesetIndex)
+                  // console.warn('-----------------------------------------------------------------')
+                  if (props.userID == ruleset.creatorID || ruleset.dialect === 'Empty') {
                     owned = ' owned';
                   }
                   if (rulesetIndex == usingRuleset) {
@@ -63,12 +66,15 @@ function RulesetSelect(props) {
                   let dateDisplay = '';
                   if (ruleset.dialect !== 'Empty') {
                     dateDisplay = niceDate(ruleset.created);
+                  } else {
+                    titleDisplay = `${props.username}'s New Empty Ruleset`;
+                    creatorDisplay = props.username;
                   }
                   return (
                     <div key={rulesetIndex} id={`ruleset-${rulesetIndex}`} onClick={props.onSelectRuleset} className={`ruleset-listing${using}${highlighted}${owned}`}>
-                      <div>'{ruleset.dialect}'</div>
+                      <div>{titleDisplay}</div>
                       <div className='ruleset-info'>{dateDisplay}</div>
-                      <small>{ruleset.changed.length} edits by <span id='ruleset-creator-credit'>{ruleset.creator}</span></small>
+                      <small>{ruleset.totalRules} rules by <span id='ruleset-creator-credit'>{creatorDisplay}</span></small>
                       <div className='ruleset-info'>
                         ID: #{rulesetIndex}
                       </div>

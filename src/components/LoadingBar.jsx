@@ -2,7 +2,7 @@ import React from 'react';
 import '../css/LoadingBar.css';
 
 function LoadingBar(props) {
-  console.error('LoadingBar rendering!', props.progress)
+  // console.error('LoadingBar rendering!', props.progress)
   
   return (    
     <div id='loading-area'>

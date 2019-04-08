@@ -7,7 +7,7 @@ import '../css/Button.css';
 import '../css/HistoryScreen.css';
 
 function HistoryScreen(props) {
-  // console.error('rendering HistoryScreen!!', props.nameEditing);
+  // // console.error('rendering HistoryScreen!!', props.nameEditing);
   return (
     <div className={props.location.location.pathname.includes('/history') ? undefined : 'hidden'} id='history-screen'>
       <div className='title-header' id='history-title'>HISTORY

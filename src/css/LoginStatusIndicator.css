@@ -1,0 +1,10 @@
+#login-status {
+  font-family: 'Nova Square';
+  width: 100%;
+  color: white;
+  font-size: var(--medium-font-size);
+}
+#login-status.logged-in {
+  color: green;
+  font-size: var(--medium-font-size);
+}

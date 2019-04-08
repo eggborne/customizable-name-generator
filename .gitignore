@@ -11,6 +11,10 @@
 # production
 /build
 
+# secret
+.htaccess
+config.php
+
 # misc
 .DS_Store
 .env.local
