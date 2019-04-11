@@ -10,8 +10,12 @@ function HistoryScreen(props) {
   // // console.error('rendering HistoryScreen!!', props.nameEditing);
   return (
     <div className={props.location.location.pathname.includes('/history') ? undefined : 'hidden'} id='history-screen'>
-      <div className='title-header' id='history-title'>HISTORY
-      <div className='title-info' id='history-count-display'>{props.namesList.length} items</div>
+      <div className='title-header' id='history-title'>
+        HISTORY
+        <div className='title-info' id='history-count-display'>
+            {props.namesList.length} items            
+        </div>
+          <Button onClick={props.onChangeMode} label={'Show Rejected:'} type='rejected-toggle' className='mode-toggle-button' selected={props.rejectedMode} />
       </div>
       <div id='history-list'>
         {props.namesList.map((nameData) => {

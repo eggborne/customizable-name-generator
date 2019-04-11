@@ -9,23 +9,45 @@ import '../css/RulesScreen.css';
 
 let ruleTypes = [
   [
-    { title: 'Valid Word Units' },
+    { title: 'Valid Syllable Parts' },
     {
-      lists: [{ title: 'Consonants that can begin a syllable', list: [], id: 'onsets' }, { title: 'Consonants that can end a syllable', list: [], id: 'codas' }, { title: 'Vowel Units', list: [], id: 'nuclei' }]
-    }
-  ],
-  [
-    { title: 'Banned Letter Sequences' },
-    {
-      lists: [{ title: 'Anywhere', list: [], id: 'universal' }, { title: 'Beginning of word', list: [], id: 'startWord' }, { title: 'Middle of word', list: [], id: 'midWord' }, { title: 'End of word', list: [], id: 'endWord' }, { title: 'Exact word only', list: [], id: 'loneWord' }]
+      lists: [
+        { id: 'onsets', title: 'Onsets', description: 'Consonant units that begin a syllable', list: [], },
+        { id: 'nuclei', title: 'Nuclei', description: 'Vowel units in the middle of syllables', list: [], },
+        { id: 'codas', title: 'Codas', description: 'Consonant units that end a syllable', list: [], },
+      ]
     }
   ],
   [
     { title: 'Banned Unit Combinations' },
     {
-      lists: [{ title: 'Two-Unit Sequences', list: {}, id: 'invalidFollowers' }, { title: 'Three-Unit Sequences', list: {}, id: 'invalidTriplets' }]
+      lists: [
+        { title: 'Two-Unit Sequences', description: '', list: {}, id: 'invalidFollowers' },
+        { title: 'Three-Unit Sequences', description: '', list: {}, id: 'invalidTriplets' }
+      ]
     }
-  ]
+  ],
+  [
+    { title: 'Banned Letter Sequences' },
+    {
+      lists: [
+        { title: 'Anywhere', description: '', list: [], id: 'universal' },
+        { title: 'Beginning of word', description: '', list: [], id: 'startWord' },
+        { title: 'Middle of word', description: '', list: [], id: 'midWord' },
+        { title: 'End of word', description: '', list: [], id: 'endWord' },
+        { title: 'Exact word only', description: '', list: [], id: 'loneWord' }
+      ]
+    }
+  ],
+  // [
+  //   { title: 'Banned Unit Combinations' },
+  //   {
+  //     lists: [
+  //       { title: 'Two-Unit Sequences', description: '', list: {}, id: 'invalidFollowers' },
+  //       { title: 'Three-Unit Sequences', description: '', list: {}, id: 'invalidTriplets' }
+  //     ]
+  //   }
+  // ]
 ];
 
 class RulesScreen extends React.PureComponent {
@@ -53,21 +75,25 @@ class RulesScreen extends React.PureComponent {
     };
   }
 
-  // componentDidMount = () => {
-
-  // }
-
-  // shouldComponentUpdate = (prevProps, nextState) => {
-  //   return (Object.values(this.state.sectionCollapsed).filter(sec => sec) !== Object.values(nextState.sectionCollapsed).filter(sec => sec)
-  //     || (prevProps.ruleData.index !== this.props.ruleData.index)
-  //     || (prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset)
+  // shouldComponentUpdate = (prevProps, nextState) => {    
+  //   let should = (Object.values(this.state.sectionCollapsed).filter(sec => sec).length !== Object.values(nextState.sectionCollapsed).filter(sec => sec).length
+  //   || (prevProps.ruleData.index !== this.props.ruleData.index)
+  //   || (prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset)
+  //   || (prevProps.location.location.pathname !== '/rules' && this.props.location.location.pathname === '/rules')
+  //   || (prevProps.location.location.pathname === '/rules' && this.props.location.location.pathname !== '/rules')
   //   );
+  //   console.log('prevloc', prevProps.location.location.pathname)
+  //   console.log('nextloc', this.props.location.location.pathname)
+  //   console.log('should?', should)
+  //   return should
   // }
 
   componentDidUpdate = (prevProps, nextState) => {
-    if ((prevProps.location.location.pathname === '/rules' && !this.props.location.location.pathname.includes('rules')
-        || prevProps.location.location.pathname === '/rules/rulesetselect' && this.props.location.location.pathname.includes('rules')
-        && prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset)) {
+    let leaving = prevProps.location.location.pathname === '/rules' && !this.props.location.location.pathname.includes('rules');
+    // let comingFromRulesetSelect = prevProps.location.location.pathname === '/rules/rulesetselect' && this.props.location.location.pathname.includes('rules');
+    let comingFromRulesetSelect = false;
+    if (leaving || comingFromRulesetSelect
+        && prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset) {
       let newCollapsed = { ...this.state.sectionCollapsed };
       for (let sec in newCollapsed) {
         newCollapsed[sec] = true;
@@ -75,7 +101,7 @@ class RulesScreen extends React.PureComponent {
       this.setState({
         sectionCollapsed: newCollapsed
       });
-    }
+    }    
   }
 
   niceDate = (grossDate) => {
@@ -144,7 +170,7 @@ class RulesScreen extends React.PureComponent {
 
   render() {
     console.error('rendering RulesScreen!!', this.props);
-    let unitTypes = [this.props.ruleData.onsets, this.props.ruleData.codas, this.props.ruleData.nuclei];
+    let unitTypes = [this.props.ruleData.onsets, this.props.ruleData.nuclei, this.props.ruleData.codas];
     let bannedTypes = [this.props.ruleData.universal, this.props.ruleData.startWord, this.props.ruleData.midWord, this.props.ruleData.endWord, this.props.ruleData.loneWord, this.props.ruleData.invalidFollowers];
     let followerTypes = [this.props.ruleData.invalidFollowers, this.props.ruleData.invalidTriplets];
     unitTypes.forEach((unitList, u) => {
@@ -156,27 +182,31 @@ class RulesScreen extends React.PureComponent {
       unitTypes[u] = newListArrays;
     });
     let onsets = unitTypes[0];
-    let codas = unitTypes[1];
-    let nuclei = unitTypes[2];
+    let nuclei = unitTypes[1];
+    let codas = unitTypes[2];
     ruleTypes.forEach((section, s) => {
       section[1].lists.forEach((list, k) => {
         if (s === 0) { list.list = unitTypes[k]; }
-        if (s === 1) { list.list = bannedTypes[k].sort(); }
-        if (s === 2) { list.list = followerTypes[k]; }
+        if (s === 1) { list.list = followerTypes[k]; }
+        if (s === 2) { list.list = bannedTypes[k].sort(); }
       });
     });
-    let allUnits = (onsets.flat() + codas.flat() + nuclei.flat())
-      .split(',')
-      .filter(unit => unit)
-      .sort()
-      .sort((a, b) => a.length - b.length);
+    let allUnits = [...[...onsets, ...nuclei, ...codas]]
+        .flat()
+        .sort()
+        .sort((a, b) => a.length - b.length)
+        .filter(unit => unit)      
     allUnits = [...new Set(allUnits)];
+
+    // console.warn('made allUnits', allUnits);
     let stringIsSelected = this.props.selectedString.string.length;
     let credit = '';
     if (this.props.ruleData.creator !== 'Default') {
       credit = ` by ${this.props.ruleData.creator}`;
     }
-    let numberOfPatterns = Object.keys(this.props.patterns.filter(pattern => pattern.rulesetID == this.props.ruleData.usingRuleset)[0].patternObject).length;
+    console.error('PROSP', this.props)
+    console.error('PARRTENES', this.props.patterns);
+    let numberOfPatterns = Object.keys(this.props.patterns.filter(pattern => pattern.rulesetID == this.props.ruleData.usingRuleset)[0].patternObject).length || -22;
     return (
       <div className={this.props.location.location.pathname.includes('/rules') ? undefined : 'hidden'} id='rules-screen'>
         <div className='title-header' id='rules-title'>
@@ -235,13 +265,13 @@ class RulesScreen extends React.PureComponent {
                       <div id={`${list.id}`} className='list-container closed hiding' key={`$list-container-${r}-${s}`}>
                         <h3 className={'rule-category-title'}>
                           <div>
-                            <div>{list.title}</div>
-                            
+                            <div id={list.id} className='outer-list-title'>{list.title}</div>                            
+                            <div className='outer-list-description'>{list.description}</div>
                             <div className={'collapsed-list-info'}>
                             {collapsed ?
                               `Items: ${numOfItems}`
                               :
-                              `Click a sequence to edit/delete`                                                              
+                              `Click a ${r ? 'sequence' : 'unit'} to edit/delete`                                                              
                             }
                             </div>                            
                           </div>
@@ -252,6 +282,7 @@ class RulesScreen extends React.PureComponent {
                             </div>
                           </div>
                         </h3>
+                          <>
                         <div className={`rule-word-list ${listClass}`}>
                           {!collapsed &&
                             stringList.map((str, i) => {
@@ -293,7 +324,9 @@ class RulesScreen extends React.PureComponent {
                                 }
                               }
                             })}
-                        </div>
+                            </div>
+                          {/* <div style={{ width: '100vw', height: '1vh' }}>DIVIDER FOR LENGTHS?</div> */}
+                        </>
                       </div>
                     );
                   } else {
@@ -301,7 +334,8 @@ class RulesScreen extends React.PureComponent {
                       <div id={`${list.id}`} key={r} className='list-container closed hiding'>
                         <h3 className={'rule-category-title'}>
                           <div>
-                            <div>{list.title}</div>
+                            <div id={list.id} className='outer-list-title'>{list.title}</div>
+                            <div className='outer-list-description'>{list.description}</div>
                             <div className={'collapsed-list-info'}>
                             {collapsed ?
                               `Initial Units: ${Object.keys(stringList).length} Items: ${[].concat.apply([], Object.values(stringList)).length}`
@@ -319,20 +353,22 @@ class RulesScreen extends React.PureComponent {
                         </h3>
                         <div className={`rule-word-list ${listClass}`} id='followers-word-list'>
                           {!collapsed && (
-                            allUnits.filter(preceder => stringList[preceder]).map((preceder, b) => {
-                              let list;
+                            // allUnits.map((preceder, b) => {
+                            allUnits.filter(preceder => stringList[preceder] && stringList[preceder].length).map((preceder, b) => {
+                              // console.log('prec', preceder)
+                              let innerList;
                               if (stringList[preceder]) {
-                                list = stringList[preceder].sort();
+                                innerList = stringList[preceder].sort();
                               } else {
-                                list = [];
+                                innerList = [];
                               }
                               return (
                                 <div key={`invalid-row-container-${r}-${s}-${b}`}>
                                   <div className='invalid-row'>
                                     <div className={'invalid-preceder'}>{preceder}</div>
                                     <div className='follower-area'>
-                                      {list.length ? (
-                                        list.map((wordPiece, w) => {
+                                      {innerList.length ? (
+                                        innerList.map((wordPiece, w) => {
                                           let elementID = `followers-word-list-${preceder}-${wordPiece}-${w}`;
                                           let pieceSelected = this.props.selectedString.string === wordPiece && this.props.selectedString.id === elementID;
                                           return (
@@ -340,7 +376,7 @@ class RulesScreen extends React.PureComponent {
                                               key={elementID}
                                               id={elementID}
                                               onClick={event => {
-                                                this.props.onClickWordPiece(event, list.id);
+                                                this.props.onClickWordPiece(event, [list.id, preceder]);
                                               }}
                                               className={pieceSelected ? 'invalid-word word-piece selected' : 'invalid-word word-piece'}>
                                               {wordPiece}

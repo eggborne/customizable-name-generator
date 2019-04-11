@@ -18,6 +18,10 @@
   pointer-events: none;
   transform: scaleX(1.1);
 }
+#history-count-display {
+  /* display: flex; */
+
+}
 #history-list {
   font-size: calc(var(--small-font-size) * 0.9);
   padding-top: 3vh;

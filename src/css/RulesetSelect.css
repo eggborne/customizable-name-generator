@@ -28,7 +28,7 @@
   grid-template-rows: auto;
   justify-items: stretch;
   align-content: start;
-  grid-row-gap: 1vh;
+  grid-row-gap: 1.5vh;
   margin-bottom: 11vh;   
   overflow-y: auto;
   /* min-height: 0; */
@@ -61,13 +61,13 @@
   justify-self: end;
 }
 .ruleset-listing.owned {
-  outline: 0.5vh solid rgb(183, 229, 160);
+  outline: 0.5vh solid rgb(52, 72, 42);
+  background-color: rgba(32, 39, 28, 0.95);
 }
 .ruleset-listing.owned #ruleset-creator-credit {
   color: white;
 }
 .ruleset-listing.owned #ruleset-creator-credit::after {
-  content: ' (you!)';
   white-space: pre;
 }
 .ruleset-listing {
@@ -98,7 +98,7 @@
   pointer-events: none;
 }
 .ruleset-listing.highlighted {
-  background: rgba(0, 200, 0, 0.6) !important;
+  background: rgba(0, 200, 0, 0.462) !important;
   border-color: white;
 }
 .ruleset-listing.using {

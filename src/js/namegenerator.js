@@ -21,23 +21,23 @@ export const namePatterns = {
     lastName: [
       { type: 'onsets', lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
-      { type: 'codas', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 2 } },
       { type: 'repeater', value: 1, lengthRange: { min: 1, max: 1 } },
     ],
   },
   'mace': {
     firstName: [
-      { type: 'onsets', lengthRange: defaultLengthRange },
+      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: defaultLengthRange },
-      { type: 'codas', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 2 } },
     ],
     lastName: [
       { type: 'onsets', lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
-      { type: 'codas', lengthRange: defaultLengthRange },
-      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
-      { type: 'nuclei', lengthRange: defaultLengthRange },
-      { type: 'codas', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 2 } },
+      { type: 'onsets', lengthRange: { min: 1, max: 2 } },
+      { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
+      // { type: 'codas', lengthRange: defaultLengthRange },
     ],
   },
   'poe': {
@@ -67,6 +67,26 @@ export const namePatterns = {
       { type: 'onsets', lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
       { type: 'codas', lengthRange: defaultLengthRange },
+    ],
+  },
+  'lando': {
+    firstName: [
+      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
+      { type: 'nuclei', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 1 } },
+      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
+      { type: 'nuclei', lengthRange: defaultLengthRange },
+    ],
+    lastName: [
+      { type: 'onsets', lengthRange: defaultLengthRange },
+      { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
+      { type: 'codas', lengthRange: { min: 1, max: 1 } },
+      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
+      { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
+      { type: 'codas', lengthRange: { min: 2, max: 5 } },
+      { type: 'onsets', lengthRange: { min: 1, max: 1 } },
+      { type: 'nuclei', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 1 } },
     ],
   },
   'jar-jar': {
@@ -145,29 +165,32 @@ export const namePatterns = {
 
 export default class NameGenerator {
   constructor() {    
-    this.nameStyles = ['basic', 'qui-gon', 'obi-wan', 'jar-jar', 'jabba', 'yoda'];
+    // this.nameStyles = ['basic', 'qui-gon', 'obi-wan', 'jar-jar', 'jabba', 'yoda'];
+    this.nameStyles = ['han', 'mace', 'kylo', 'poe', 'obi-wan', 'jar-jar', 'jabba', 'yoda'];
     this.basicStyles = ['han', 'mace', 'kylo', 'poe'];
     this.esPlurals = ['h', 'sh', 'sch', 'v', 'x', 'z'];
     this.usedKeys = [];
     this.totalCalls = 0;
     this.special = undefined;
-    this.produceRandomNextPiece = (firstPiece, typeArr) => {
+    this.produceRandomNextPiece = (firstPiece, typeArr, currentWord) => {
+      // console.warn('CURRENT WORD SO FAR IS:', currentWord);
       firstPiece = firstPiece.toLowerCase();
+      // console.warn('firstPiece IS:', firstPiece);
       let ruleData = this.cachedRules;
       let followerArray = typeArr;
       if (ruleData.invalidFollowers[firstPiece]) {
         if (ruleData.nuclei.indexOf(firstPiece) === -1) {
-          // console.log(firstPiece, 'produceRandomNextPiece got', firstPiece, 'invalid followers:', typeArr)
+          // console.log(firstPiece, 'produceRandomNextPiece got', firstPiece, 'invalid followers:', ruleData.invalidFollowers[firstPiece])
         }
         followerArray = followerArray.filter(letter => ruleData.invalidFollowers[firstPiece].indexOf(letter) === -1);
-        if (ruleData.codas.indexOf(firstPiece) > -1) {
+        // if (ruleData.codas.indexOf(firstPiece) > -1) {
           // console.log('only searchiing limited array for firstPiece', firstPiece);
           // console.info(followerArray);
-        }
+        // }
       }
-      return this.randomType(followerArray);
+      return this.getRandomUnitFromArray(followerArray);
     }
-    this.randomType = (typeArr) => {      
+    this.getRandomUnitFromArray = (typeArr) => {      
       if (typeArr.filter && this.special === 'simple') {
         typeArr = typeArr.filter(segment => segment.length === 1);    
       }
@@ -204,7 +227,7 @@ export default class NameGenerator {
     this.cachedRules = undefined;
 
     this.produceName = (pattern) => {
-      // console.log('cached', this.cachedRules)
+      // // console.log('cached', this.cachedRules)
       let nameData = {
         fullName: '',
         wordUnits: {
@@ -215,6 +238,7 @@ export default class NameGenerator {
       for (let wordType in pattern) {
         // console.log('pattern', pattern)
         let word = pattern[wordType];
+        // console.log('word', word)
         word.map((unit, i) => {
           let newPiece;
           if (unit.type === 'literal') {
@@ -227,30 +251,37 @@ export default class NameGenerator {
           } else if (unit.type === 'repeater') {
             newPiece = nameData.wordUnits[wordType][unit.value];
           } else {
-            // console.log('making filterArray for type', unit.type)
-            let filterArray = this.cachedRules[unit.type];
+            // console.log('making filteredArray for type', unit.type)
+            let filteredArray = this.cachedRules[unit.type];
+
+            // apply exclusions and char limit
+
             if (unit.exclude) {
-              filterArray = filterArray.filter(wordUnit => !unit.exclude.includes(wordUnit[0]));
-              // console.error('exclude now filterArray', filterArray)
+              filteredArray = filteredArray.filter(wordUnit => !unit.exclude.includes(wordUnit[0]));
+              // // console.error('exclude now filteredArray', filteredArray)
             } if (unit.lengthRange.min > 1 || unit.lengthRange.max < 5) {
-              filterArray = filterArray.filter(wordUnit => wordUnit.length >= unit.lengthRange.min && wordUnit.length <= unit.lengthRange.max);
-              // console.error('lengthRange now filterArray', unit.lengthRange.min, 'to', unit.lengthRange.max, filterArray)
+              filteredArray = filteredArray.filter(wordUnit => wordUnit.length >= unit.lengthRange.min && wordUnit.length <= unit.lengthRange.max);
+              // // console.error('lengthRange now filteredArray', unit.lengthRange.min, 'to', unit.lengthRange.max, filteredArray)
             }
+
+            // capitalize if first of word string or preceded by hyphen
+
             let lastPiece = nameData.wordUnits[wordType][i - 1];
             if (i > 0 && lastPiece !== '-') {
-              newPiece = this.produceRandomNextPiece(lastPiece, filterArray);
+              newPiece = this.produceRandomNextPiece(lastPiece, filteredArray, nameData.wordUnits[wordType]);
             } else {
               // first letter
-              newPiece = this.randomType(filterArray);
+              // not scanned for previous-letter-based rules
+              newPiece = this.getRandomUnitFromArray(filteredArray);
               newPiece = newPiece[0].toUpperCase() + newPiece.slice(1, newPiece.length);
             }
           }
           // if (newPiece) {
           //   if (newPiece.length > unit.lengthRange.max) {
-          //     console.warn(newPiece, 'longer than', unit.lengthRange.max, 'at point', nameData.wordUnits[wordType], '. Truncating.');
+          //     // console.warn(newPiece, 'longer than', unit.lengthRange.max, 'at point', nameData.wordUnits[wordType], '. Truncating.');
           //   }
           //   if (newPiece.length < unit.lengthRange.min) {
-          //     console.warn(newPiece, 'shorter than', unit.lengthRange.min, 'at point', nameData.wordUnits[wordType]);
+          //     // console.warn(newPiece, 'shorter than', unit.lengthRange.min, 'at point', nameData.wordUnits[wordType]);
           //   }
           // }          
           nameData.wordUnits[wordType].push(newPiece);
@@ -259,9 +290,9 @@ export default class NameGenerator {
       return nameData;
     }
     this.getViolations = (nameData) => {
-      console.log('getting viol for namedata', nameData)
-      console.log('using cached rules')
-      console.log(this.cachedRules)
+      // console.log('getting viol for namedata', nameData)
+      // console.log('using cached rules')
+      // console.log(this.cachedRules)
       let banned = false;
       let invalid = false
       let violation;
@@ -275,16 +306,16 @@ export default class NameGenerator {
         endWord: this.cachedRules.endWord,  
         loneWord: this.cachedRules.loneWord,  
       };     
-      console.log('using invalidStrings', invalidStrings)
+      // console.log('using invalidStrings', invalidStrings)
       for (let i = 0; i < wordArray.length; i++) {
         let word = wordArray[i].toLowerCase();
         for (let ruleType in invalidStrings) {
           let invalidArr = invalidStrings[ruleType];
-          // console.log(word, 'searching ruleType', ruleType)
+          // // console.log(word, 'searching ruleType', ruleType)
           for (let s = 0; s < invalidArr.length; s++) {
             let invalidString = invalidArr[s];
           
-            // console.log('checking',word,'for',invalidString,'using',ruleType)
+            // // console.log('checking',word,'for',invalidString,'using',ruleType)
   
             if (word.indexOf(invalidString) > -1) {  
               let violating;
@@ -301,13 +332,13 @@ export default class NameGenerator {
                 violating = word === invalidString;
               }
               if (violating) {   
-                // console.log(word,'violated',ruleType,violating)
-                console.warn("VIOLATOR!", word, invalidString, ruleType)
+                // // console.log(word,'violated',ruleType,violating)
+                // console.warn("VIOLATOR!", word, invalidString, ruleType)
                 if (invalidStrings.banned.indexOf(invalidString) > -1) {
-                  console.error(word, 'is BANNED!')
+                  // console.error(word, 'is BANNED!')
                   banned = true;
                 } else {
-                  console.error(word, 'is INVALID')
+                  // console.error(word, 'is INVALID')
                   invalid = true;
                 }
                 violation = {
@@ -324,7 +355,7 @@ export default class NameGenerator {
                 }
               }
             } else {
-              // console.log(word,'DOES NOT HAVE',invalidString)
+              // // console.log(word,'DOES NOT HAVE',invalidString)
             }
           };
         }
@@ -338,13 +369,13 @@ export default class NameGenerator {
     this.getName = (ruleData, style, special) => {
       let nameData = {};
       this.special = special;
-      console.log('ruleData is', ruleData)
+      // console.log('ruleData is', ruleData)
       if (ruleData) {
         this.cachedRules = ruleData;
-        console.log('caching rules!', ruleData.creator, ruleData);        
+        // console.log('caching rules!', ruleData.creator, ruleData);        
       } else {
         ruleData = this.cachedRules;
-        console.log('using cached rules', this.cachedRules)
+        // console.log('using cached rules', this.cachedRules)
       }
       this.totalCalls++; 
       let invalidStrings = {
@@ -368,7 +399,7 @@ export default class NameGenerator {
           mode = this.basicStyles[randomInt(0, this.basicStyles.length - 1)];
         }
       }
-      // console.error('mode', mode)
+      // // console.error('mode', mode)
       let newName = this.produceName(this.namePatterns[mode]);
       nameData = newName;
       firstName = newName.wordUnits.firstName.join('');
@@ -378,7 +409,7 @@ export default class NameGenerator {
       }
       let actualLastName = lastName;
       if (actualLastName[0] === ' ') {
-        console.error('had to fix last name', lastName)
+        // console.error('had to fix last name', lastName)
         actualLastName = actualLastName.slice(1, lastName.length);
       }
       if (invalidStrings.banned.indexOf(actualLastName.toLowerCase()) > -1) {
@@ -410,8 +441,8 @@ export default class NameGenerator {
         nameData.violation = violationData.violation;
         nameData.style = mode;
         if (violationData.violation) {
-          console.error('violationData', nameData.fullName, violationData);        
-          console.error('returning', nameData);        
+          // console.error('violationData', nameData.fullName, violationData);        
+          // console.error('returning', nameData);        
         }
         return nameData;
       } else {

@@ -200,7 +200,7 @@ a {
 }
 .list-container {
   position: relative;
-  padding: 1vh;
+  padding: 1.5vh;
   border-radius: 0.5vh;
   margin-top: 1vh;
   margin-bottom: 1vh;
@@ -209,10 +209,10 @@ a {
   min-height: 7.5vh;
   display: flex;
   flex-direction: column;
-  opacity: 1;
+  opacity: 0.99;
 }
 .list-container > * {
-  transition: all 210ms ease;
+  /* transition: all 210ms ease; */
 }
 .list-container:last-of-type {
   margin-bottom: 0;
@@ -226,9 +226,9 @@ a {
 }
 .list-container.closed {
   padding-bottom: 0 !important;
-  margin-bottom: 0 !important;
-  min-height: 7.5vh;
-  max-height:9vh;
+  /* margin-bottom: 0 !important; */
+  /* min-height: 7.5vh; */
+  /* max-height:9vh; */
 }
 .rule-category-title {
   margin: 0;
@@ -236,6 +236,24 @@ a {
   display: flex;
   justify-content: space-between;
   font-size: var(--medium-font-size);  
+}
+.outer-list-title {
+  font-size: var(--nav-font-size);
+  margin-top: 0.5vh;
+  margin-bottom: 1.5vh;  
+}
+#onsets.outer-list-title {
+  color: #a8d5a8;
+}
+#nuclei.outer-list-title {
+  color: #d2d6aa;
+}
+#codas.outer-list-title {
+  color: #e2bdbd;
+}
+.outer-list-description {
+  font-size: var(--medium-font-size); 
+
 }
 .collapsed-list-info {
   color: #aaa;
@@ -261,7 +279,7 @@ a {
   grid-template-rows: repeat(auto, 1fr);
   align-content: center;
   padding: 0;
-  margin-top: 1vh;
+  margin-top: 2vh;
 }
 .rule-word-list.invalid {
   grid-template-columns: repeat(7, 1fr);

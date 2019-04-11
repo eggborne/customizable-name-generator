@@ -49,15 +49,7 @@ function NameDisplay(props) {
   let className = props.bulkMode ? 'quick' : undefined;
   if (props.nameData) {
     displayName = props.nameData.fullName;
-    if (props.nameData.invalid) {
-      className = 'purple-text';
-    }
-    if (props.nameData.banned) {
-      className = 'green-text';
-    }
-    if (window.location.pathname !== '/namegenerator/') {
-      className = 'not-showing';
-    } else if (props.dataReady) {
+    if (props.dataReady) {
       if (document.getElementById('name-display') && document.getElementById('name-display').classList.contains('obscured')) {
         document.getElementById('name-display').classList.remove('obscured');
       }          

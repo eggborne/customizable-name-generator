@@ -74,6 +74,11 @@ button.mini-button {
   border: 0.1rem solid rgb(102, 83, 83);
   font-size: var(--medium-font-size);
 }
+#rejected-toggle-button {
+  align-items: center;
+  width: calc(var(--base-font-size) * 4);
+  padding: 1vw
+}
 #custom-button {  
   background-color: rgb(105, 74, 8);
 }

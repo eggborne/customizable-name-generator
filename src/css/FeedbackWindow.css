@@ -173,7 +173,7 @@
   border: 0.25vh solid rgb(37, 41, 37);
   cursor: pointer;
   background-image: none !important;
-  transition: border-color 105ms ease, background-color 300ms ease;
+  transition: border-color 105ms ease, background-color 210ms ease;
 }
 .feedback-select-toggle.selected {
   background-color: green !important;
@@ -216,4 +216,51 @@
   transform: scaleX(0.9) scaleY(0.75);
   opacity: 0;
   /* pointer-events: none; */
+}
+.followers-selection {
+  /* box-sizing: content-box; */
+  border: 2px solid transparent;
+  padding: 0;
+}
+.followers-selection.selected-green {
+  border-color: green;
+}
+.followers-selection.selected-red {
+  border-color: red;
+}
+.large-input.sequence {
+  animation: flash;
+  animation-duration: 150ms;
+  animation-iteration-count: infinite;
+  animation-play-state: paused;
+  caret-color: transparent;
+  font-size: var(--large-font-size);
+}
+.large-input.sequence:not(.focused) {
+  outline: none;  
+}
+.large-input.sequence.focused::placeholder {
+  color: rgb(69, 69, 69);
+}
+.large-input.sequence.focused {
+  animation-play-state: running;
+  outline: 2px solid;
+}
+#submit-preceder-input.focused {
+  background: rgba(0, 128, 0, 0.025);
+}
+#submit-follower-input.focused {
+  background: rgba(128, 0, 0, 0.025);
+}
+#submit-follower-input {
+  border-color: rgb(54, 0, 0);
+}
+
+@keyframes flash {
+  0% {
+    outline-color: transparent;
+  }
+  100% {
+    outline-color: #ffffff99;
+  }
 }

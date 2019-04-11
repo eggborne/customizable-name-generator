@@ -1,4 +1,4 @@
-<?php include("config.php");  
+<?php include("config.php");
   $sql= "SELECT * FROM `invalid-strings` ORDER BY lastEdited DESC;";
   $result=mysqli_query($link, $sql);
   $patternSql = "SELECT * FROM `patterns`;";

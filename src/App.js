@@ -18,6 +18,10 @@ window.addEventListener('DOMContentLoaded', event => {
   console.log('DOM fully loaded and parsed in', window.performance.now() - initialLoad);  
 });
 
+let updateTimer;
+let rapidTimer;
+let buttonCheck;
+
 let initialLoad = window.performance.now();
 
 const invalidRules = ['banned', 'universal', 'startWord', 'midWord', 'endWord', 'loneWord'];
@@ -106,45 +110,57 @@ function getAllRulesets() {
     }
   });
 }
-function sendNewRules33(userID, rulesObj) {
-  // console.log('sendNewRule took in', arguments);
-  // let changedRules = rulesObj.lastChanged;
-  console.log('rulesObj.lastChanged!', rulesObj.lastChanged)
-  let lastRulesIndex = undefined;
-  if (rulesObj.usingRuleset > 99) {
-    lastRulesIndex = parseInt(rulesObj.usingRuleset);
-  }
-  for (let preceder in rulesObj.invalidFollowers) {
-    let followerArr = rulesObj.invalidFollowers[preceder];
-    followerArr.map((unit, i) => {
-      if (unit.includes("q'")) {
-        followerArr[i] = unit.replace("q'", 'qapos');
-        console.log('made a q\' in', preceder);
-      }
-    })
-  }
-  let changedRules = [];
-  rulesObj.lastChanged.listTypes.forEach((listType, i, arr) => {
-    changedRules[i] = {};
-    changedRules[i].listName = listType;
-    changedRules[i].listBody = rulesObj[listType];
-  });
-  console.info(changedRules)
-  let rawData = {
-    userID: userID,
-    rulesetID: rulesObj.index,
-    changedRules: changedRules
-  };
-  console.info('raw',rawData)
+function refreshCurrentRuleset(rulesetID) {
   return axios({
-    method: 'post',
-    url: `${ROOT}sendnewrules3.php`,
+    method: 'get',
+    url: `${ROOT}refreshruleset.php`,
     headers: {
       'Content-type': 'application/x-www-form-urlencoded'
     },
-    data: JSON.stringify(rawData)
+    params: {
+      rulesetID: rulesetID
+    }
   });
 }
+// function sendNewRules33(userID, rulesObj) {
+//   // console.log('sendNewRule took in', arguments);
+//   // let changedRules = rulesObj.lastChanged;
+//   console.log('rulesObj.lastChanged!', rulesObj.lastChanged)
+//   let lastRulesIndex = undefined;
+//   if (rulesObj.usingRuleset > 99) {
+//     lastRulesIndex = parseInt(rulesObj.usingRuleset);
+//   }
+//   for (let preceder in rulesObj.invalidFollowers) {
+//     let followerArr = rulesObj.invalidFollowers[preceder];
+//     followerArr.map((unit, i) => {
+//       if (unit.includes("q'")) {
+//         followerArr[i] = unit.replace("q'", 'qapos');
+//         console.log('made a q\' in', preceder);
+//       }
+//     })
+//   }
+//   let changedRules = [];
+//   rulesObj.lastChanged.listTypes.forEach((listType, i, arr) => {
+//     changedRules[i] = {};
+//     changedRules[i].listName = listType;
+//     changedRules[i].listBody = rulesObj[listType];
+//   });
+//   console.info(changedRules)
+//   let rawData = {
+//     userID: userID,
+//     rulesetID: rulesObj.index,
+//     changedRules: changedRules
+//   };
+//   console.info('raw',rawData)
+//   return axios({
+//     method: 'post',
+//     url: `${ROOT}sendnewrules3.php`,
+//     headers: {
+//       'Content-type': 'application/x-www-form-urlencoded'
+//     },
+//     data: JSON.stringify(rawData)
+//   });
+// }
 function sendNewRules(userID, rulesObj) {
   // let changedRules = rulesObj.lastChanged;
   let lastRulesIndex = undefined;
@@ -170,14 +186,16 @@ function sendNewRules(userID, rulesObj) {
   });
   let ruleEntry = changedRules[0];
   // changedRules.forEach(ruleEntry => {
-    console.log('ruleentry?', ruleEntry)
+    // console.log('ruleentry?', ruleEntry)
+    // console.log('rulesObj?', rulesObj)
     let rawData = {
-      userID: userID,
-      rulesetID: parseInt(ruleEntry.index),
+      userID: rulesObj.creatorID,
+      rulesetID: ruleEntry.index,
       ruleType: ruleEntry.listName,
       newList: ruleEntry.listBody
     };
-    console.info('raw for', ruleEntry, rawData);
+    console.info('raw for', rawData);
+    console.info('stringified',JSON.stringify(rawData))
     return axios({
       method: 'post',
       url: `${ROOT}sendnewrules.php`,
@@ -298,12 +316,11 @@ class App extends Component {
       currentEditType: null,
       selectedString: {        
         string: '',
+        sequence: [],
         elementIds: [],
         indexes: [],
         id: '',
-        ruleType: '',
-        preceder: '',
-        follower: ''
+        ruleType: ''        
       },
       inputFocused: null,
       selectedLetters: [],
@@ -318,7 +335,7 @@ class App extends Component {
       passwordOk: false,
       passwordsMatch: false,
       rulesets: [],
-      patterns: []
+      patterns: [],
     };
     console.log(this.state.ruleData)
     this.generator = new NameGenerator();    
@@ -337,12 +354,47 @@ class App extends Component {
     document.body.addEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
   }
   componentDidUpdate = (prevProps, nextState) => {
-    if (prevProps.location.location.pathname === '/' && this.props.location.location.pathname !== '/') {
+    let leaving = prevProps.location.location.pathname === '/' && this.props.location.location.pathname !== '/';
+    let entering = prevProps.location.location.pathname !== '/' && this.props.location.location.pathname === '/';
+    let rulesEntering = prevProps.location.location.pathname !== '/' && this.props.location.location.pathname === '/rules';
+    let rulesLeaving = prevProps.location.location.pathname === '/rules' && this.props.location.location.pathname === '/';
+    let historyEntering = prevProps.location.location.pathname === '/' && this.props.location.location.pathname === '/history';
+    let historyLeaving = prevProps.location.location.pathname === '/history' && this.props.location.location.pathname === '/';
+    if (leaving && !historyEntering) {
       document.body.removeEventListener(clickListener.lowerCase.down, this.bodyFingerDown);
       document.body.removeEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
-    } else if (prevProps.location.location.pathname !== '/' && this.props.location.location.pathname === '/') {
+    } else if (entering && !historyLeaving) {
       document.body.addEventListener(clickListener.lowerCase.down, this.bodyFingerDown);
       document.body.addEventListener(clickListener.lowerCase.up, this.bodyFingerUp);
+    }
+    if (rulesEntering && !updateTimer) {
+      // updateTimer = setInterval(() => {
+      //   console.warn('updating :)');
+      //   refreshCurrentRuleset(this.state.ruleData.index).then(response => {
+      //     console.log('response?----------->', response);
+      //     let newRules = response.data.rules[0];
+      //     let patterns = response.data.patterns[0];
+      //     console.info(newRules, patterns);
+      //     for (let list in newRules) {
+      //       if (newRules[list][0] === '[' || newRules[list][0] === '{') {
+      //         newRules[list] = JSON.parse(newRules[list]);
+      //       }
+      //     }
+      //     for (let list in patterns) {
+      //       if (patterns[list][0] === '[' || patterns[list][0] === '{') {
+      //         patterns[list] = JSON.parse(patterns[list]);
+      //       } else {
+      //         patterns[list] = parseInt(patterns[list]);
+      //       }
+      //     }
+      //     console.info(newRules, patterns);
+      //     let ruleDataCopy = { ...this.state.ruleData, ... newRules, patterns};
+      //     console.info(ruleDataCopy);
+      //     this.setState({
+      //       ruleData: ruleDataCopy
+      //     })
+      //   });
+      // }, 3000)
     }
   }
 
@@ -350,14 +402,14 @@ class App extends Component {
     let numberOfRules = 0;
     if (ruleset[listType].length) {
       if (listType !== 'changed' && listType !== 'onsets' && listType !== 'codas' && listType !== 'nuclei') {
-        console.log('adding?',ruleset[listType].length,'of',ruleset)
+        // console.log('adding?',ruleset[listType].length,'of',ruleset)
         numberOfRules += ruleset[listType].length;
       }
     } else {
       let followerListArray = Object.values(ruleset[listType]);
       followerListArray.forEach(list => {
         numberOfRules += list.length
-        console.log('adding', list.length, 'for', list)
+        // console.log('adding', list.length, 'for', list)
       });
     }
     return numberOfRules;
@@ -379,17 +431,17 @@ class App extends Component {
       loginInfo = await this.attemptLogin(username, 'abc', token);
     }
     getAllRulesets().then(allRulesets => {
-      console.log('allr', allRulesets)
+      console.log('allRulesets', allRulesets)
       let rulesetList = allRulesets.data[0];
       let patterns = allRulesets.data[1];
       rulesetList.map(ruleset => {
         let totalRules = 0;
         for (let listType in ruleset) {
           if (ruleset[listType][0] === '[' || listType === 'invalidFollowers') {
+            
             ruleset[listType] = JSON.parse(ruleset[listType]);
             totalRules += this.getTotalRulesInList(ruleset, listType);
           }
-          console.error("SETTING total to", totalRules)
         }
         ruleset.totalRules = totalRules;
       });
@@ -411,7 +463,6 @@ class App extends Component {
         titleText = 'not logged in'
       }      
       patterns.forEach(pattern => { pattern.patternObject = JSON.parse(pattern.patternObject) });
-      console.log('made', patterns)
       this.setState({
         statusText: `Using ruleset #${newRuleData.index} '${newRuleData.dialect}'${credit}`,
         titleText: titleText,
@@ -429,14 +480,64 @@ class App extends Component {
   }
 
   bodyFingerDown = event => {
+    console.log(event.target)
+    if (event.target.id === 'generate-more-button' && !rapidTimer) {
+      this.displayNewName();
+      rapidTimer = setInterval(() => {
+        this.displayNewName();
+        if (Date.now() - this.state.fingerData.fingerDownAt > 2000) {
+          clearInterval(rapidTimer); 
+          rapidTimer = undefined;
+          event.target.classList.remove('pressed');
+          let newFingerData = {
+            fingerDown: false,
+            fingerDownAt: 0
+          };
+          this.setState({
+            fingerData: newFingerData
+          }, () => {
+            document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;              
+          });
+        }
+      }, 20);
+    }    
+    setTimeout(() => {
+      if (event.target.id === 'main-button') {
+        console.log('since?', Date.now() - this.state.fingerData.fingerDownAt);
+        console.log('finger?', this.state.fingerData.fingerDown)
+        if (Date.now() - this.state.fingerData.fingerDownAt > 200) {
+          event.target.classList.remove('pressed');
+          let newFingerData = {
+            fingerDown: false,
+            fingerDownAt: 0
+          };
+          this.setState({
+            fingerData: newFingerData
+          });
+        }
+      }
+    }, 210);
+    let newFingerData = {
+      fingerDown: event,
+      fingerDownAt: Date.now()
+    };
     this.setState({
-      fingerData: { fingerDown: event, fingerDownAt: Date.now() }
+      fingerData: newFingerData
     });
   }
-  bodyFingerUp = () => {
+  bodyFingerUp = (event) => {
+    if (event.target.id === 'generate-more-button' && rapidTimer) {
+      clearInterval(rapidTimer);
+      rapidTimer = undefined;
+      document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;
+    }
+    let newFingerData = {
+      fingerDown: false,
+      fingerDownAt: 0
+    };
     this.setState({
-      fingerData: { fingerDown: false, fingerDownAt: 0 }
-    });
+      fingerData: newFingerData
+    });    
   }
 
   showMessage = (message, duration) => {
@@ -452,22 +553,35 @@ class App extends Component {
   }
 
   handleClickGenerate = event => {
-    if (this.state.bulkMode) {
-      for (let i = 0; i < this.state.bulkAmount; i++) {
-        setTimeout(() => {
-          this.displayNewName();
-        }, i * 20);
+    if (this.props.location.location.pathname === '/history') {
+      if (this.state.fingerData.fingerDown) {
+        // setTimeout(() => {
+        //   this.displayNewName();
+        // }, i * 20);
       }
+      
+      // for (let i = 0; i < this.state.bulkAmount; i++) {
+      //   setTimeout(() => {
+      //     this.displayNewName();
+      //   }, i * 20);
+      // }
+      // setTimeout(() => {
+      //   document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;
+      // }, ((this.state.bulkAmount+10) * 20))
     } else {
+      let startTime = window.performance.now();
       this.displayNewName();
     }
     if (event) {
       event.preventDefault();
     }
   };
+
+
   displayNewName = customRules => {
-    let rulesToSend;
+    let historyShowing = this.props.location.location.pathname === '/history';
     let currentSpecial;
+    let rulesToSend;
     if (this.state.hasNewRules) {
       rulesToSend = this.state.ruleData;
       this.setState({
@@ -480,7 +594,9 @@ class App extends Component {
     if (this.state.simpleMode) {
       currentSpecial = 'simple';
     }
-    let newNameData = this.generator.getName(rulesToSend, this.state.currentNameStyle, currentSpecial);
+    // let newNameData = this.generator.getName(rulesToSend, this.state.currentNameStyle, currentSpecial);
+    let newNameData;
+    newNameData = this.generator.getName(rulesToSend, this.state.currentNameStyle, currentSpecial);
     let newProductionData = { ...this.state.productionData };
     newProductionData.calledThisRun++;
     if (newNameData.redundant) {
@@ -495,7 +611,7 @@ class App extends Component {
             productionData: newProductionData
           },
           () => {
-            console.error('GOT INVALID. TRYING AGAIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+            console.error('GOT REDUNDANT. TRYING AGAIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
             return this.displayNewName();
           }
         );
@@ -519,7 +635,7 @@ class App extends Component {
           );
         }
       } else if (newNameData.invalid && !this.state.rejectedMode) {
-        console.error('GOT INVALID. TRYING AGAIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+        console.error('GOT INVALID. TRY AGAIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', newNameData.fullName, newNameData.violation.rule, newNameData.violation.invalidString);
         return this.displayNewName();
       }
     } else {
@@ -532,15 +648,21 @@ class App extends Component {
       }
       // document.getElementById('tally-text').innerHTML = `got ${newNameData.fullName} in ${(window.performance.now() - startTime).toPrecision(3)}ms${addendum}`;
       let delay = 0;
-      if (!this.state.bulkMode) {
+      if (!historyShowing) {
+        console.warn(this.props.location.location.pathname)
         delay = swapSpeed * 1.5;
       } else {
-        if (newProductionData.namesList.length % 6 === 0) {
+        if (document.getElementById('history-list')
+          && (newProductionData.calledThisRun === 0 || newProductionData.namesList.length % 6 === 0))
+        {
           document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;
         }
       }
+      if (this.props.location.location.pathname == '/history') {
+        delay = 0;
+      }
       setTimeout(() => {
-        if (this.state.bulkMode && newProductionData.namesList.length > 200) {
+        if (historyShowing && newProductionData.namesList.length > 200) {
           newProductionData.namesList = newProductionData.namesList.slice(newProductionData.namesList.length - 200, newProductionData.namesList.length - 1);
         }
         newProductionData.namesList.push(newNameData);
@@ -552,8 +674,8 @@ class App extends Component {
             productionData: newProductionData
           },
           () => {
-            if (this.state.bulkMode) {
-              document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;
+            if (historyShowing) {
+              // document.getElementById('history-list').scrollTop = document.getElementById('history-list').scrollHeight;
             }
           }
         );
@@ -733,10 +855,16 @@ class App extends Component {
       feedbackTypesSelected.push(listName);
       currentEditType = listName;
     }
+    let inputFocused = this.state.inputFocused;
+    if (currentEditType === 'invalidFollowers') {
+      inputFocused = 'submit-preceder-input';
+      console.log('SET TO inputfofcuerds', inputFocused)
+    }
     this.setState({
       feedbackMode: newMode,
       currentEditType: currentEditType,
-      feedbackTypesSelected: feedbackTypesSelected
+      feedbackTypesSelected: feedbackTypesSelected,
+      inputFocused: inputFocused
     });
   }
   getNameData = fullName => {
@@ -771,25 +899,40 @@ class App extends Component {
     this.setFeedbackMode('editString', type);
   };
 
-  handleClickWordPiece = (event, ruleType, clear) => {
+  handleClickWordPiece = (event, ruleType, clear) => {    
     let selected;
+    console.log('word piece args', event, ruleType, clear)
     if (event && !clear) {
       let el = event.target;
       let wordPiece = el.innerHTML;
+      console.log('el',el)
+      console.log('wordPiece',wordPiece)
       console.log(el.id);
       if (!clear && el.id !== this.state.selectedString.id && wordPiece !== this.state.selectedString.string) {
-        // let offX = 50 - Math.round(((window.innerWidth / 2) - event.clientX) / (window.innerWidth / 2) * 40);
-        // let offY = 50 - Math.round(((window.innerHeight / 2) - event.clientY) / (window.innerHeight / 2) * 50);
-        // console.log(`${offX}% ${offY}%`)
-        // // el.style.transformOrigin = `${offX}% ${offY}%`;
-        selected = {
-          string: wordPiece,
-          id: el.id,
-          ruleType: ruleType
-        };
+        if (typeof ruleType === 'String') {
+          console.warn('setting a selected string')
+          selected = {
+            string: wordPiece,
+            sequence: [wordPiece],
+            id: el.id,
+            ruleType: ruleType
+          };
+        } else {
+          console.warn('setting a selected sequence');
+          if (ruleType[0] === 'invalidFollowers') {
+            let preceder = ruleType[1];
+            selected = {
+              string: wordPiece,
+              sequence: [preceder, wordPiece],
+              id: el.id,
+              ruleType: ruleType
+            };
+          }
+        }
       } else {
         selected = {
           string: '',
+          sequence: [],
           id: '',
           ruleType: ''
         };
@@ -797,6 +940,7 @@ class App extends Component {
     } else {
       selected = {
         string: '',
+        sequence: [],
         id: '',
         ruleType: ''
       };
@@ -831,6 +975,16 @@ class App extends Component {
       this.setState({
         feedbackTypesDiscovered: feedbackTypesDiscovered
       });
+    });
+  }
+  handleEnterSequenceUnit = (unit, position) => {
+    console.log('uinuit?', unit);
+    let selected = { ...this.state.selectedString };
+    selected.sequence[position] = unit;
+    this.setState({      
+      selectedString: selected
+    }, () => {
+      console.log('selected now', selected)
     });
   }
 
@@ -913,10 +1067,11 @@ class App extends Component {
     } else {      
       if (feedbackObj.listTypes[0] === 'invalidFollowers') {
         if (!ruleData[feedbackObj.listTypes[0]][feedbackObj.units[0]]) {
+
           ruleData[feedbackObj.listTypes[0]][feedbackObj.units[0]] = [];
         }
         ruleData[feedbackObj.listTypes[0]][feedbackObj.units[0]].push(feedbackObj.units[1])
-        console.log('chabnged ruleData!')
+        console.log('changed ruleData!')
         console.log(ruleData[feedbackObj.listTypes[0]])
       }
       ruleDescription = feedbackObj.units.join('-').toUpperCase();
@@ -944,7 +1099,8 @@ class App extends Component {
           let newRuleData = { ...this.state.ruleData };
           // let creatorName = `${this.state.username}-${Date.now()}`;
           newRuleData.rulesetSelected = response.data;
-          newRuleData.usingRuleset = response.data;          
+          newRuleData.usingRuleset = response.data;   
+          console.log('usingrulesdet st as', newRuleData.usingRuleset);
           this.setState({
             ruleData: newRuleData,
             feedbackTypesSelected: []
@@ -980,34 +1136,58 @@ class App extends Component {
         listTypes: this.state.feedbackTypesSelected
       };
     } else {
-      let preceder = document.querySelector('.large-input.sequence0').value;
-      let follower = document.querySelector('.large-input.sequence1').value;
+      // let preceder = document.querySelector('.large-input.sequence0').value;
+      // let follower = document.querySelector('.large-input.sequence1').value;
+      let preceder = this.state.selectedString.sequence[0];
+      let follower = this.state.selectedString.sequence[1];
       console.log('----------------- preceder', preceder);
       console.log('----------------- follower', follower);
       feedback = {
-        units: [preceder, follower],
+        units: this.state.selectedString.sequence,
         listTypes: this.state.feedbackTypesSelected
       }
     }
     if (this.state.userLoggedIn) {
       this.submitFeedback(feedback);
     } else {
-
+      console.error('Not saving because not logged in.')
     }
     event.preventDefault();
   }
 
   handleClickDeleteString = (event) => {
+    console.log('deleting while state is', this.state)
+    let successMessage;
     let doomedString = { ...this.state.selectedString }.string;
+    let doomed;
     let ruleData = { ...this.state.ruleData };
-    ruleData[this.state.selectedString.ruleType].splice(ruleData[this.state.selectedString.ruleType].indexOf(doomedString), 1);
+    let listName;
+    if (this.state.selectedString.ruleType.splice) {
+      listName = this.state.selectedString.ruleType[0];
+    } else {
+      listName = this.state.selectedString.ruleType;
+    }
+    if (ruleData[listName].splice) { // list is an array
+      doomed = { ...this.state.selectedString }.string;
+      ruleData[listName].splice(ruleData[listName].indexOf(doomedString), 1);
+      successMessage = `Rule for '${doomed.toUpperCase()}' deleted.`;
+    } else { // list is an object
+      doomed = { ...this.state.selectedString }.sequence;
+      successMessage = `Rule for '${doomed[0].toUpperCase()}-${doomed[1].toUpperCase()}' deleted.`
+      let followerList = ruleData[listName][doomed[0]];
+      console.log('delete from follower list?', followerList, doomed[1])
+      followerList.splice(followerList.indexOf(doomed[1]), 1);
+      console.log('new list?', followerList);
+
+    }
     ruleData.lastChanged = {
-      listTypes: [this.state.selectedString.ruleType],
-      value: doomedString
+      listTypes: [listName],
+      value: doomed
     };
+    console.log('sending ruleData', ruleData)
     sendNewRules(this.state.userID, ruleData).then(response => {
       if (response) {
-        setTimeout(() => { this.showMessage(`Rule for '${doomedString.toUpperCase()}' deleted.`, 1600) }, 1);
+        setTimeout(() => { this.showMessage(successMessage, 1600) }, 1);
       }
       let newRuleData = { ...this.state.ruleData };
       newRuleData.rulesetSelected = response.data;
@@ -1015,6 +1195,7 @@ class App extends Component {
       this.setState({
         ruleData: newRuleData,
         selectedString: {
+          sequence: [],
           string: '',
           id: '',
           ruleType: ''
@@ -1032,21 +1213,27 @@ class App extends Component {
     })
   }
 
-  handleClickWordUnit = (event) => {
-    let unit = event.target.innerHTML;
-    if (!this.state.inputFocused) {
-      let precederInput = document.getElementById('submit-preceder-input');
-      let followerInput = document.getElementById('submit-follower-input');
-      if (!precederInput.value) {
-        precederInput.value = unit;
-        followerInput.focus();
-        this.setState({
-          inputFocused: 'submit-follower-input'
-        })
-      }
-    } else {
-      document.getElementById(this.state.inputFocused).value = unit;
-    }
+  handleClickSequenceUnit = (event) => {
+    // // console.log('focus', this.props.inputFocused)
+    // let unit = event.target.innerHTML;
+    // if (event.target.classList.contains('followers-selection')) {
+    //   console.log('clicked a sequence selectable!', unit);
+
+    // }
+    // console.log(event.target.classList)
+    // if (!this.state.inputFocused) {
+    //   let precederInput = document.getElementById('submit-preceder-input');
+    //   let followerInput = document.getElementById('submit-follower-input');
+    //   if (!precederInput.value) {
+    //     precederInput.value = unit;
+    //     followerInput.focus();
+    //     this.setState({
+    //       inputFocused: 'submit-follower-input'
+    //     })
+    //   }
+    // } else {
+    //   document.getElementById(this.state.inputFocused).value = unit;
+    // }
   }
   handleClickRegister = (event) => {
     this.setState({
@@ -1248,7 +1435,7 @@ class App extends Component {
                   onClickCallRegister={this.handleClickCallRegister}
                   patterns={this.state.patterns}
                 />
-                <HistoryScreen location={location} nameEditing={this.state.nameEditing} selectedString={this.state.selectedString} onClickName={this.handleClickName} namesList={this.state.productionData.namesList} onClickBack={this.handleClickBack} onClickGenerateMore={this.handleClickGenerate} onclickClearList={this.handleClearList} />
+                <HistoryScreen location={location} nameEditing={this.state.nameEditing} selectedString={this.state.selectedString} rejectedMode={this.state.rejectedMode} onChangeMode={this.handleChangeMode} onClickName={this.handleClickName} namesList={this.state.productionData.namesList} onClickBack={this.handleClickBack} onClickGenerateMore={this.handleClickGenerate} onclickClearList={this.handleClearList} />
                 <Route path='/rules' render={() =>
                   <>
                     <RulesetSelect
@@ -1277,13 +1464,15 @@ class App extends Component {
                   currentEditType={this.state.currentEditType}
                   onClickFeedback={this.handleClickFeedback}
                   onClickInput={this.handleClickInput}
-                  onClickWordUnit={this.handleClickWordUnit}
+                  onClickSequenceUnit={this.handleClickSequenceUnit}
                   onEnterLetter={this.handleEnterLetter}
+                  onEnterSequenceUnit={this.handleEnterSequenceUnit}
                   onClickSendFeedback={this.handleClickSendFeedback}
                   onClickBack={this.handleClickBack}
                   onClickLogOut={this.handleClickLogOut}
                   ruleData={this.state.ruleData}
-                  nameData={this.state.nameEditing}                  
+                  nameData={this.state.nameEditing}
+                  inputFocused={this.state.inputFocused}
                 />
                 <LoginWindow
                     location={location}
@@ -1305,7 +1494,7 @@ class App extends Component {
               </>
             )}
             <NameDisplay location={location} progress={this.state.loadingProgress} dataReady={this.state.dataReady} fingerDown={this.state.fingerData.fingerDown} onClickName={this.handleClickName} nameData={featuredName} bulkMode={this.state.bulkMode} />
-            <ButtonArea currentNameStyle={this.state.currentNameStyle} readyToGenerate={this.state.dataReady} blockMode={this.state.blockMode} bulkMode={this.state.bulkMode} simpleMode={this.state.simpleMode} rejectedMode={this.state.rejectedMode} onChangeStyle={this.handleChangeStyle} onChangeMode={this.handleChangeMode} onClickGenerate={this.handleClickGenerate} />
+            <ButtonArea currentNameStyle={this.state.currentNameStyle} readyToGenerate={this.state.dataReady} blockMode={this.state.blockMode} simpleMode={this.state.simpleMode} rejectedMode={this.state.rejectedMode} onChangeStyle={this.handleChangeStyle} onChangeMode={this.handleChangeMode} onClickGenerate={this.handleClickGenerate} />
             <TitleBar userLoggedIn={this.state.userLoggedIn} titleText={this.state.titleText} statusText={this.state.statusText} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />
           </div>
         )}

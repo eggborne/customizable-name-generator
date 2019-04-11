@@ -7,8 +7,32 @@ import '../css/FeedbackWindow.css';
 import { namePatterns } from '../js/namegenerator.js';
 
 function FeedbackWindow(props) {
-  // console.error('rendering FeedbackWindow!!', props.showing);
 
+  console.error('rendering FeedbackWindow!!', props);
+
+  let sequenceTextInput0 = React.createRef();
+  let sequenceTextInput1 = React.createRef();
+
+  function handleClickSequenceUnit(event) {
+    console.log('sequenceTextInput0', sequenceTextInput0.current.classList.contains('focused'));
+    console.log('sequenceTextInput1', sequenceTextInput1.current.classList.contains('focused'));
+    let position = 0;
+    let focusedInput;
+    if (sequenceTextInput0.current.classList.contains('focused')) {
+      focusedInput = sequenceTextInput0.current;
+    } else if (sequenceTextInput1.current.classList.contains('focused')) {
+      position = 1;
+      focusedInput = sequenceTextInput1.current;
+    }
+    if (!focusedInput) {
+      sequenceTextInput0.current.focus = true;
+      focusedInput = sequenceTextInput0.current;
+    }
+    focusedInput.value = event.target.innerHTML;
+    props.onEnterSequenceUnit(event.target.innerHTML, position)
+    // props.onClickSequenceUnit(event)    
+  }
+  
   requestAnimationFrame(() => {
     // [...document.querySelectorAll('.name-letter')].map(word => {
     //   console.log('word', word);
@@ -64,7 +88,7 @@ function FeedbackWindow(props) {
   }
   if (props.showing === 'editString') {
     inputValue = props.selectedString;
-  }
+  }  
   let typeClass = props.showing;
   if (typeClass === 'editString') {
     typeClass = 'enter';
@@ -131,40 +155,62 @@ function FeedbackWindow(props) {
         )}
         {props.currentEditType === 'invalidFollowers' &&
           <>
-            {/* <div> */}
             <div className='follower-selection-area'>
-                {props.ruleData.onsets.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
-                  let elementID = `followers-selection-list-${p}`;
-                  return (
-                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
-                      {preceder}
-                    </div>
-                  );
-                })}
+              {props.ruleData.onsets.sort().sort((a, b) => a.length - b.length).map((sequenceUnit, p) => {
+                let unitClass = 'invalid-word word-piece followers-selection';                
+                let elementID = `followers-selection-list-${p}`;
+                return (
+                  <div onClick={(event) => handleClickSequenceUnit(event)} key={elementID} id={elementID} className={unitClass}>
+                    {sequenceUnit}
+                  </div>
+                );
+              })}
               <div style={{width: '100%', height: '1vh'}}></div>
-              {props.ruleData.nuclei.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
-                  let elementID = `followers-selection-list-${p}`;
+              {props.ruleData.nuclei.sort().sort((a, b) => a.length - b.length).map((sequenceUnit, p) => {
+                let unitClass = 'invalid-word word-piece followers-selection';                            
+                let elementID = `followers-selection-list-${p}`;
                   return (
-                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
-                      {preceder}
+                    <div onClick={(event) => handleClickSequenceUnit(event)} key={elementID} id={elementID} className={unitClass}>
+                      {sequenceUnit}
                     </div>
                   );
               })}
               <div style={{ width: '100%', height: '1vh' }}></div>
-              {props.ruleData.codas.sort().sort((a, b) => a.length - b.length).map((preceder, p) => {
-                  let elementID = `followers-selection-list-${p}`;
-                  return (
-                    <div onClick={props.onClickWordUnit} key={elementID} id={elementID} className={'invalid-word word-piece'}>
-                      {preceder}
-                    </div>
-                  );
+              {props.ruleData.codas.sort().sort((a, b) => a.length - b.length).map((sequenceUnit, p) => {
+                let unitClass = 'invalid-word word-piece followers-selection';                          
+                let elementID = `followers-selection-list-${p}`;
+                return (
+                  <div onClick={(event) => handleClickSequenceUnit(event)} key={elementID} id={elementID} className={unitClass}>
+                    {sequenceUnit}
+                  </div>
+                );
               })}
-              </div>
-            {/* </div> */}
+            </div>
             <div id='follower-inputs'>
-              <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' className='large-input sequence0' id='submit-preceder-input'></input>
+              <input
+                // readOnly
+              
+                ref={sequenceTextInput0}
+                onFocus={(event) => { props.onClickInput(event) }}
+                // onChange={(event) => props.onEnterSequenceUnit(event, 0)}
+                maxLength='5'
+                placeholder={props.inputFocused === 'submit-preceder-input' ? 'Click a unit above' : 'Click to enter unit'}
+                type='text'
+                className={props.inputFocused === 'submit-preceder-input' ? 'large-input sequence sequence0 focused' : 'large-input sequence sequence0'}
+                id='submit-preceder-input'>
+              </input>
               <div>will never be followed by</div>
-              <input onClick={(event) => props.onClickInput(event)} onChange={(event) => props.onEnterLetter(event)} maxLength='5' placeholder={'enter unit'} type='text' className='large-input red-border sequence1' id='submit-follower-input'></input>
+              <input
+                // readOnly
+                ref={sequenceTextInput1}
+                onFocus={(event) => { props.onClickInput(event) }}
+                // onChange={(event) => props.onEnterSequenceUnit(event, 1)}
+                maxLength='5'
+                placeholder={props.inputFocused === 'submit-follower-input' ? 'Click a unit above' : 'Click to enter unit'}
+                type='text'
+                className={props.inputFocused === 'submit-follower-input' ? 'large-input sequence sequence1 focused' : 'large-input sequence sequence1'}
+                id='submit-follower-input'>
+              </input>
             </div>
           </>
         }
@@ -188,8 +234,15 @@ const isEqual = (prevProps, nextProps) => {
   if (!prevProps.showing && nextProps.showing && nextProps.showing === 'editString') {    
     setTimeout(() => { document.getElementById('submit-string-input').value = nextProps.selectedString.string }, 1);    
   }
-  let equalTest = prevProps.showing === nextProps.showing && prevProps.selectedLetters.length === nextProps.selectedLetters.length && prevProps.feedbackTypesSelected.length === nextProps.feedbackTypesSelected.length && prevProps.feedbackTypesDiscovered.length === nextProps.feedbackTypesDiscovered.length;
+  let equalTest =
+    prevProps.inputFocused === nextProps.inputFocused
+    && prevProps.showing === nextProps.showing
+    && prevProps.selectedLetters.length === nextProps.selectedLetters.length
+    && prevProps.feedbackTypesSelected.length === nextProps.feedbackTypesSelected.length
+    && prevProps.feedbackTypesDiscovered.length === nextProps.feedbackTypesDiscovered.length
+    && prevProps.highlightedSequenceUnit == nextProps.highlightedSequenceUnit;
   return equalTest;
 };
 
-export default React.memo(FeedbackWindow, isEqual);
+// export default React.memo(FeedbackWindow, isEqual);
+export default FeedbackWindow;
