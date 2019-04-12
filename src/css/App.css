@@ -46,6 +46,11 @@
   --title-font: 'Exo 2';
   --secondary-font: 'Nova Square';
 
+  --common-border-radius: 0.5vh;
+  --onset-color: #00ff0016;
+  --nucleus-color: #f2ff0016;
+  --coda-color: #ff000016;
+
 }
 body {
   position: fixed;
@@ -257,8 +262,8 @@ form {
 .floating {
   position: absolute;
   z-index: 12;
-  border-bottom-left-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: var(--button-border-radius);
+  border-bottom-right-radius: var(--button-border-radius);
 }
 .lower-nav-panel.floating {
   grid-template-columns: 40% 1fr;
@@ -330,6 +335,7 @@ h2 {
   box-shadow: 0px 0px 5px 0px black;
   border: 1px solid #090909;
   z-index: 4;
+  border-radius: var(--button-border-radius);
 }
 #history-title {
   /* flex-direction: column; */

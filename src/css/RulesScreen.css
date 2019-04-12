@@ -74,7 +74,7 @@ a {
   margin-top: 2vh;
   margin-bottom: 2vh;
   border: 1px solid #161629;
-  border-radius: 0.5vh;
+  border-radius: var(--common-border-radius);
   width: 100%;
 }
 .rule-header {
@@ -88,7 +88,7 @@ a {
   align-items: center;
   font-size: var(--large-font-size);
   background-color: #222;
-  border-radius: 0.5vh;
+  border-radius: var(--common-border-radius);
 }
 .rule-header .rule-edit-button {
   font-size: var(---medium-font-size);
@@ -185,7 +185,7 @@ a {
 }
 #log-in-button, #log-out-button {
   min-width: 16vw;
-  height: 4vh;
+  /* height: 4vh; */
 }
 #log-out-button {
   background-color: var(--danger-button-color);
@@ -201,7 +201,7 @@ a {
 .list-container {
   position: relative;
   padding: 1.5vh;
-  border-radius: 0.5vh;
+  border-radius: var(--common-border-radius);
   margin-top: 1vh;
   margin-bottom: 1vh;
   background-color: #222;

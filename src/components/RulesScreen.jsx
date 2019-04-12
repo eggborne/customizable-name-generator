@@ -9,12 +9,12 @@ import '../css/RulesScreen.css';
 
 let ruleTypes = [
   [
-    { title: 'Valid Syllable Parts' },
+    { title: 'Valid Syllable Units' },
     {
       lists: [
-        { id: 'onsets', title: 'Onsets', description: 'Consonant units that begin a syllable', list: [], },
-        { id: 'nuclei', title: 'Nuclei', description: 'Vowel units in the middle of syllables', list: [], },
-        { id: 'codas', title: 'Codas', description: 'Consonant units that end a syllable', list: [], },
+        { id: 'onsets', title: 'Onsets', description: 'Consonant units that can begin a syllable', list: [], },
+        { id: 'nuclei', title: 'Nuclei', description: 'Vowel units in the middle of a syllable', list: [], },
+        { id: 'codas', title: 'Codas', description: 'Consonant units that can end a syllable', list: [], },
       ]
     }
   ],
@@ -28,7 +28,7 @@ let ruleTypes = [
     }
   ],
   [
-    { title: 'Banned Letter Sequences' },
+    { title: 'Banned Unit Sequences' },
     {
       lists: [
         { title: 'Anywhere', description: '', list: [], id: 'universal' },
@@ -50,7 +50,7 @@ let ruleTypes = [
   // ]
 ];
 
-class RulesScreen extends React.PureComponent {
+class RulesScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -75,18 +75,18 @@ class RulesScreen extends React.PureComponent {
     };
   }
 
-  // shouldComponentUpdate = (prevProps, nextState) => {    
-  //   let should = (Object.values(this.state.sectionCollapsed).filter(sec => sec).length !== Object.values(nextState.sectionCollapsed).filter(sec => sec).length
-  //   || (prevProps.ruleData.index !== this.props.ruleData.index)
-  //   || (prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset)
-  //   || (prevProps.location.location.pathname !== '/rules' && this.props.location.location.pathname === '/rules')
-  //   || (prevProps.location.location.pathname === '/rules' && this.props.location.location.pathname !== '/rules')
-  //   );
-  //   console.log('prevloc', prevProps.location.location.pathname)
-  //   console.log('nextloc', this.props.location.location.pathname)
-  //   console.log('should?', should)
-  //   return should
-  // }
+  shouldComponentUpdate = (prevProps, nextState) => {    
+    let should = (Object.values(this.state.sectionCollapsed).filter(sec => sec).length !== Object.values(nextState.sectionCollapsed).filter(sec => sec).length
+    || (prevProps.ruleData.index !== this.props.ruleData.index)
+    || (prevProps.ruleData.usingRuleset !== this.props.ruleData.usingRuleset)
+    || (prevProps.userID !== this.props.userID)
+    || (prevProps.location.location.pathname !== '/rules' && this.props.location.location.pathname === '/rules')
+      || (prevProps.location.location.pathname === '/rules' && this.props.location.location.pathname !== '/rules')
+      || (prevProps.selectedString.string !== this.props.selectedString.string)
+      || (prevProps.selectedString.sequence !== this.props.selectedString.sequence)
+    );
+    return should;
+  }
 
   componentDidUpdate = (prevProps, nextState) => {
     let leaving = prevProps.location.location.pathname === '/rules' && !this.props.location.location.pathname.includes('rules');
@@ -204,8 +204,7 @@ class RulesScreen extends React.PureComponent {
     if (this.props.ruleData.creator !== 'Default') {
       credit = ` by ${this.props.ruleData.creator}`;
     }
-    console.error('PROSP', this.props)
-    console.error('PARRTENES', this.props.patterns);
+    console.error('patterns', this.props.patterns);
     let numberOfPatterns = Object.keys(this.props.patterns.filter(pattern => pattern.rulesetID == this.props.ruleData.usingRuleset)[0].patternObject).length || -22;
     return (
       <div className={this.props.location.location.pathname.includes('/rules') ? undefined : 'hidden'} id='rules-screen'>

@@ -116,4 +116,12 @@ function RulesetSelect(props) {
   );
 }
 
-export default React.memo(RulesetSelect);
+const isEqual = (prevProps, nextProps) => {
+  let equalTest =
+    (prevProps.location.location.pathname !== '/rules/rulesetselect' && nextProps.location.location.pathname !== '/rules/rulesetselect')
+    && prevProps.usingRuleset === nextProps.usingRuleset
+    && prevProps.rulesetSelected === nextProps.rulesetSelected;
+  return equalTest;
+};
+
+export default React.memo(RulesetSelect, isEqual);

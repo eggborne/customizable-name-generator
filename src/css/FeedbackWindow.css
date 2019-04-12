@@ -10,6 +10,7 @@
   background-color: hsl(0, 0%, 7%);
   transition: opacity 210ms ease, transform 210ms ease;
   transform-origin: center center;
+  border-radius: var(--button-border-radius);
 }
 #feedback-info-message {
   position: absolute;
@@ -101,13 +102,13 @@
   outline: 1px solid white
 }
 #feedback-title .onsets {
-  background-color: #00ff0016;
-}
-#feedback-title .codas {
-  background-color: #ff000016;
+  background-color: var(--onset-color);
 }
 #feedback-title .nuclei {
-  background-color: #f2ff0016;
+  background-color: var(--nucleus-color);
+}
+#feedback-title .codas {
+  background-color: var(--coda-color);
 }
 #feedback-title .literal {
   box-shadow: none;
@@ -126,7 +127,7 @@
   max-height: var(--small-font-size);
 }
 #feedback-selected-display {
-  border-radius: 0.25rem;
+  border-radius: var(--common-border-radius);
   border: 0.1rem solid rgb(37, 57, 37);
   font-size: var(--name-font-size);
   display: flex;

@@ -14,8 +14,6 @@ function FeedbackWindow(props) {
   let sequenceTextInput1 = React.createRef();
 
   function handleClickSequenceUnit(event) {
-    console.log('sequenceTextInput0', sequenceTextInput0.current.classList.contains('focused'));
-    console.log('sequenceTextInput1', sequenceTextInput1.current.classList.contains('focused'));
     let position = 0;
     let focusedInput;
     if (sequenceTextInput0.current.classList.contains('focused')) {
@@ -30,7 +28,6 @@ function FeedbackWindow(props) {
     }
     focusedInput.value = event.target.innerHTML;
     props.onEnterSequenceUnit(event.target.innerHTML, position)
-    // props.onClickSequenceUnit(event)    
   }
   
   requestAnimationFrame(() => {
@@ -188,8 +185,7 @@ function FeedbackWindow(props) {
             </div>
             <div id='follower-inputs'>
               <input
-                // readOnly
-              
+                readOnly
                 ref={sequenceTextInput0}
                 onFocus={(event) => { props.onClickInput(event) }}
                 // onChange={(event) => props.onEnterSequenceUnit(event, 0)}
@@ -201,7 +197,7 @@ function FeedbackWindow(props) {
               </input>
               <div>will never be followed by</div>
               <input
-                // readOnly
+                readOnly
                 ref={sequenceTextInput1}
                 onFocus={(event) => { props.onClickInput(event) }}
                 // onChange={(event) => props.onEnterSequenceUnit(event, 1)}
@@ -244,5 +240,4 @@ const isEqual = (prevProps, nextProps) => {
   return equalTest;
 };
 
-// export default React.memo(FeedbackWindow, isEqual);
-export default FeedbackWindow;
+export default React.memo(FeedbackWindow, isEqual);

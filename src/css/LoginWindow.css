@@ -14,7 +14,7 @@
   opacity: 1;
   padding-bottom: 4vh;
   border-radius: var(--button-border-radius);
-  transform: translateY(-25%);
+  transform: translateY(-10%);
   transition: transform 210ms ease, opacity 210ms ease;
 }
 form {

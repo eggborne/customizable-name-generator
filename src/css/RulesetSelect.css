@@ -18,6 +18,7 @@
   z-index: 1; 
   transition: transform 210ms ease, opacity 210ms ease; */
   padding: 0;
+  border-radius: var(--button-border-radius);
   /* margin-bottom: 1vh; */  
 }
 #ruleset-list {

@@ -11,6 +11,7 @@ import RulesScreen from './components/RulesScreen.jsx';
 import RulesetSelect from './components/RulesetSelect.jsx';
 import FeedbackWindow from './components/FeedbackWindow.jsx';
 import LoginWindow from './components/LoginWindow.jsx';
+import ConfirmModal from './components/ConfirmModal.jsx';
 import { namePatterns } from './js/namegenerator.js';
 import { v4 as uuid } from 'uuid';
 
@@ -162,7 +163,7 @@ function refreshCurrentRuleset(rulesetID) {
 //   });
 // }
 function sendNewRules(userID, rulesObj) {
-  // let changedRules = rulesObj.lastChanged;
+  // let changedRules = rulesObj.lastChanged;  
   let lastRulesIndex = undefined;
   if (rulesObj.usingRuleset > 99) {
     lastRulesIndex = parseInt(rulesObj.usingRuleset);
@@ -189,13 +190,13 @@ function sendNewRules(userID, rulesObj) {
     // console.log('ruleentry?', ruleEntry)
     // console.log('rulesObj?', rulesObj)
     let rawData = {
-      userID: rulesObj.creatorID,
+      userID: userID,
       rulesetID: ruleEntry.index,
       ruleType: ruleEntry.listName,
       newList: ruleEntry.listBody
     };
-    console.info('raw for', rawData);
-    console.info('stringified',JSON.stringify(rawData))
+    // console.info('raw for', rawData);
+    // console.info('stringified',JSON.stringify(rawData))
     return axios({
       method: 'post',
       url: `${ROOT}sendnewrules.php`,
@@ -205,6 +206,24 @@ function sendNewRules(userID, rulesObj) {
       data: JSON.stringify(rawData)
     });
   // });
+}
+function sendNewPatterns(userID, token, rulesetID, newPatterns) {
+  let rawData = {
+    userID: userID,
+    token: token,
+    rulesetID: parseInt(rulesetID),
+    newPatterns: newPatterns
+  };
+  // console.info('raw for sendNewPatterns is', rawData);
+  // console.info('stringified',JSON.stringify(rawData))
+  return axios({
+    method: 'post',
+    url: `${ROOT}sendnewpatterns.php`,
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded'
+    },
+    data: JSON.stringify(rawData)
+  });
 }
 const setCookie = (cookieName, cookieObj, daysToExpire) => {
   console.log('expir', cookieObj)
@@ -336,6 +355,9 @@ class App extends Component {
       passwordsMatch: false,
       rulesets: [],
       patterns: [],
+      confirmMode: null,
+      confirmText: null,
+      confirmEffect: null
     };
     console.log(this.state.ruleData)
     this.generator = new NameGenerator();    
@@ -480,7 +502,6 @@ class App extends Component {
   }
 
   bodyFingerDown = event => {
-    console.log(event.target)
     if (event.target.id === 'generate-more-button' && !rapidTimer) {
       this.displayNewName();
       rapidTimer = setInterval(() => {
@@ -503,8 +524,6 @@ class App extends Component {
     }    
     setTimeout(() => {
       if (event.target.id === 'main-button') {
-        console.log('since?', Date.now() - this.state.fingerData.fingerDownAt);
-        console.log('finger?', this.state.fingerData.fingerDown)
         if (Date.now() - this.state.fingerData.fingerDownAt > 200) {
           event.target.classList.remove('pressed');
           let newFingerData = {
@@ -553,6 +572,11 @@ class App extends Component {
   }
 
   handleClickGenerate = event => {
+    // console.log('state patterns', this.state.patterns);
+    // let newPattern = [...this.state.patterns].filter(pattern => pattern.rulesetID !== this.state.ruleData.usingRuleset)[0].patternObject;
+    // console.log('newpattern?', newPattern);
+    // sendNewPatterns(this.state.userID, this.state.cookieID, this.state.ruleData.usingRuleset, newPattern);
+
     if (this.props.location.location.pathname === '/history') {
       if (this.state.fingerData.fingerDown) {
         // setTimeout(() => {
@@ -572,6 +596,9 @@ class App extends Component {
       let startTime = window.performance.now();
       this.displayNewName();
     }
+
+
+
     if (event) {
       event.preventDefault();
     }
@@ -649,7 +676,6 @@ class App extends Component {
       // document.getElementById('tally-text').innerHTML = `got ${newNameData.fullName} in ${(window.performance.now() - startTime).toPrecision(3)}ms${addendum}`;
       let delay = 0;
       if (!historyShowing) {
-        console.warn(this.props.location.location.pathname)
         delay = swapSpeed * 1.5;
       } else {
         if (document.getElementById('history-list')
@@ -909,7 +935,8 @@ class App extends Component {
       console.log('wordPiece',wordPiece)
       console.log(el.id);
       if (!clear && el.id !== this.state.selectedString.id && wordPiece !== this.state.selectedString.string) {
-        if (typeof ruleType === 'String') {
+        console.log('NOT already selected')
+        if (typeof ruleType === 'string') {
           console.warn('setting a selected string')
           selected = {
             string: wordPiece,
@@ -945,6 +972,7 @@ class App extends Component {
         ruleType: ''
       };
     }
+    console.log('setting selstring to', selected)
     this.setState({
       selectedString: selected,
     });
@@ -1240,9 +1268,6 @@ class App extends Component {
       loginAction: 'registering'
     });
   }
-  handleClickLogOut = (event) => {
-    
-  }
   handleLoginUsernameInputChange = (event) => {
     let value = event.target.value;
     this.setState({
@@ -1389,9 +1414,11 @@ class App extends Component {
     this.attemptLogin(field1.value, field2.value, this.state.cookieID);
     event.preventDefault();
   }
-  handleClickLogOut = (event) => {
+  logUserOut = (event) => {
+    console.log('logging user out!!')
     this.setState({
       // titleText: 'not logged in',
+      confirmMode: null,
       userLoggedIn: false,
       cookieRecognized: false,
       cookieID: null,
@@ -1401,9 +1428,24 @@ class App extends Component {
     });
     destroyCookie();
   }
+  handleClickLogOut = (event) => {
+    this.setState({
+      confirmMode: 'logOut',
+      confirmText: 'LOG OUT?',
+    })
+    // this.logUserOut();
+  }
   handleToggleSaveCookie = (event) => {
     this.setState({
       saveCookie: !this.state.saveCookie
+    })
+  }
+  handleClickCancelConfirm = () => {
+    document.getElementById('confirm-modal').classList.remove('showing');
+    this.setState({
+      confirmMode: null,
+      // confirmText: null,
+      // confirmEffect: null
     })
   }
 
@@ -1420,6 +1462,12 @@ class App extends Component {
               {this.state.dataReady && (
               <>
                 <div id='indicator-container'><div id='save-indicator'></div></div>
+                <ConfirmModal
+                  mode={this.state.confirmMode}
+                  titleText={this.state.confirmText}
+                  onConfirmLogOut={this.logUserOut}
+                  onClickCancelLogout={this.handleClickCancelConfirm}
+                />
                 <RulesScreen location={location} userLoggedIn={this.state.userLoggedIn} username={this.state.username} userID={this.state.userID} onClickEdit={this.handleClickEdit} onClickDeleteString={this.handleClickDeleteString} onClickAdd={this.handleClickAdd} selectedString={this.state.selectedString} onClickBack={this.handleClickBack} onClickWordPiece={this.handleClickWordPiece} onClickChangeRuleset={this.handleClickChangeRuleset} onClickBack={this.handleClickBack} ruleData={this.state.ruleData}
                   titleText={this.state.titleText}
                   feedbackTypesSelected={this.state.feedbackTypesSelected}

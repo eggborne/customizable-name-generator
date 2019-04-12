@@ -1,12 +1,12 @@
 function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; };
 const defaultLengthRange = {
   min: 1,
-  max: 5 // unlimited
+  max: 2 // unlimited
 };
 export const namePatterns = {
   'yoda': {
     firstName: [
-      { type: 'onsets', lengthRange: defaultLengthRange },
+      { type: 'onsets', lengthRange: { min: 1, max: 3 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
       { type: 'codas', lengthRange: defaultLengthRange },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
@@ -14,7 +14,7 @@ export const namePatterns = {
   },
   'han': {
     firstName: [
-      { type: 'onsets', lengthRange:  { min: 1, max: 1 } },
+      { type: 'onsets', lengthRange: defaultLengthRange },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
       { type: 'codas', lengthRange: defaultLengthRange },
     ],
@@ -34,7 +34,7 @@ export const namePatterns = {
     lastName: [
       { type: 'onsets', lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
-      { type: 'codas', lengthRange: { min: 1, max: 2 } },
+      { type: 'codas', lengthRange: { min: 1, max: 1 } },
       { type: 'onsets', lengthRange: { min: 1, max: 2 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
       // { type: 'codas', lengthRange: defaultLengthRange },
@@ -112,8 +112,8 @@ export const namePatterns = {
       { type: 'onsets', lengthRange: defaultLengthRange },
       { type: 'nuclei', lengthRange: defaultLengthRange },
       { type: 'codas', lengthRange: { min: 1, max: 1 } },
-      { type: 'codas', lengthRange: { min: 1, max: 1 } },
-      // { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
+      // { type: 'codas', lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 }, exclude: ['e'] },          
       { type: 'literal', value: ' ', lengthRange: { min: 1, max: 1 } },
       { type: 'literal', value: 't', lengthRange: { min: 1, max: 1 } },
@@ -123,8 +123,9 @@ export const namePatterns = {
     lastName: [
       { type: 'onsets', lengthRange: defaultLengthRange },
       { type: 'nuclei', lengthRange: { min: 1, max: 1 } },
-      { type: 'codas', lengthRange: defaultLengthRange },
-      // { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
+      // { type: 'codas', lengthRange: defaultLengthRange },
+      { type: 'codas', lengthRange: { min: 1, max: 1 } },
+      { type: 'repeater', value: 2, lengthRange: { min: 1, max: 1 } }
     ],
   },
   'obi-wan': {

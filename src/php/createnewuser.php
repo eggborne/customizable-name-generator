@@ -25,9 +25,9 @@
       $newUserID=mysqli_insert_id($link);
       
       $patternSql="INSERT INTO `patterns` (`creatorID`, `patternObject`) VALUES ('$newUserID', '$patterns');";
-      mysqli_query($link,"INSERT INTO `invalid-strings` (`creatorID`, `creator`, `created`) VALUES ('$newUserID', '$username', NOW());");
-      $newRulesID=mysqli_insert_id($link);
-      mysqli_query($link,"INSERT INTO `invalid-strings` (`id`) VALUES ('$newRulesID');");
+      // mysqli_query($link,"INSERT INTO `invalid-strings` (`creatorID`, `creator`, `created`) VALUES ('$newUserID', '$username', NOW());");
+      // $newRulesID=mysqli_insert_id($link);
+      // mysqli_query($link,"INSERT INTO `invalid-strings` (`id`) VALUES ('$newRulesID');");
       $patternResult=mysqli_query($link,$patternSql);
     } else {
       echo 'nameTaken';
