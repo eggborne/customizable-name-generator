@@ -236,12 +236,12 @@ const setCookie = (cookieName, cookieObj, daysToExpire) => {
 const getCookie = (cookieName) => {
   return new Promise((resolve, reject) => {
     let decodedCookie = decodeURIComponent(document.cookie);
-    console.log('decodedCookie', decodedCookie)
     if (decodedCookie) {
       let cookies = decodedCookie.split(';');
       let matchingCookie = cookies.filter(cookie => cookie.includes(cookieName));
       if (matchingCookie.length) {
         matchingCookie = matchingCookie[0].split('=');
+        matchingCookie[0] = matchingCookie[0].replace(/\s/g, '');
         matchingCookie[1] = JSON.parse(matchingCookie[1]);
         let cookieName = matchingCookie[1].username;
         let token = matchingCookie[1].token;
@@ -258,7 +258,6 @@ const getCookie = (cookieName) => {
           });
         }
       } else {
-        console.error('wrong cookie')
         resolve(false);
       }
     } else {
@@ -267,7 +266,7 @@ const getCookie = (cookieName) => {
     }
   });
 };
-const checkCookie = async () => await getCookie('namecreator');
+const checkCookie = () => getCookie('namecreator');
 const destroyCookie = () => {
   setCookie('namecreator', null, 0);
 }
@@ -441,12 +440,15 @@ class App extends Component {
   }
 
   logUserInIfCookieOK = async () => {
+    console.error('logUserInIfCookieOK...')
     let loggedIn = false;
     let cookieResult = await checkCookie('namecreator');  
+    console.log('cookie result?', cookieResult)
     let username = 'Guest';
     let token = null;
     let loginInfo;
     if (cookieResult) {
+      console.error('namecreator FOUND!')
       username = cookieResult.username;
       token = cookieResult.token
       this.setState({
@@ -454,6 +456,8 @@ class App extends Component {
         cookieID: token
       });
       loginInfo = await this.attemptLogin(username, 'abc', token);
+    } else {
+      console.error('namecreator ookie NOT FOUND')
     }
     getAllRulesets().then(allRulesets => {
       console.log('allRulesets', allRulesets)
