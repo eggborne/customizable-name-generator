@@ -471,7 +471,7 @@ class App extends Component {
         ruleset.totalRules = totalRules;
       });
       let userOnlyRulesets = rulesetList.filter(ruleset => ruleset.creatorID == this.state.userID);
-      let lastEditedRuleset = userOnlyRulesets[0] || rulesetList.filter(ruleset => ruleset.index == 42)[0];
+      let lastEditedRuleset = userOnlyRulesets[0] || rulesetList.filter(ruleset => ruleset.index == 100)[0];
       let rulesIndex = lastEditedRuleset.index;
       let newRuleData = lastEditedRuleset;
       newRuleData.usingRuleset = rulesIndex;
