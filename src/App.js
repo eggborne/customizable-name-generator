@@ -257,6 +257,9 @@ const getCookie = (cookieName) => {
             token: token
           });
         }
+      } else {
+        console.error('wrong cookie')
+        resolve(false);
       }
     } else {
       resolve(false);
