@@ -34,7 +34,7 @@ button.bounced {
   transform: scale(1.02);
 }
 button.bottom-nav {
-  height: 8vh;
+  height: 2rem;
   padding: 0;
   padding-left: 2vw;
   padding-right: 2vw;
@@ -43,8 +43,9 @@ button.bottom-nav {
 }
 button.mini-button {
   font-size: var(--nav-font-size);  
-  padding: 1vw;
+  /* padding: 1vw; */
   border-radius: 1vmin;
+  min-height: 100%;
 }
 .clickable {
   cursor: pointer;

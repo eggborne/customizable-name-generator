@@ -1,5 +1,6 @@
 #title-footer {
-  background-color: #040404;
+  /* background-color: #040404; */
+  background-color: #041404;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -8,13 +9,14 @@
   padding-left: 3vw;
   padding-right: 3vw;
   align-self: start;
-  font-size: var(--large-font-size);
+  font-size: 1rem;
   color: #444;
   display: flex;
   justify-content: space-between;
   align-items: center;
   line-height: 120%;
-  height: calc(var(--medium-font-size) * 4);
+  height: var(--footer-height);
+  /* height: calc(var(--medium-font-size) * 4); */
 }
 i {
   margin-right: 3vmin;
@@ -26,15 +28,15 @@ i {
   flex-grow: 1;
 }
 #title-text {
-  font-size: var(--medium-font-size);
+  font-size: var(--small-font-size);
   color: rgb(125, 78, 78);
 }
 #title-text.logged-in {
-  font-size: var(--large-font-size);
+  font-size: var(--small-font-size);
   color: var(--button-color);
 }
 #tally-text {
-  font-size: var(--medium-font-size);
+  font-size: var(--small-font-size);
   font-family: var(--secondary-font);
   transition: opacity 210ms ease;
 }

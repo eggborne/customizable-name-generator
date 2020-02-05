@@ -1549,7 +1549,17 @@ class App extends Component {
               </>
             )}
             <NameDisplay location={location} progress={this.state.loadingProgress} dataReady={this.state.dataReady} fingerDown={this.state.fingerData.fingerDown} onClickName={this.handleClickName} nameData={featuredName} bulkMode={this.state.bulkMode} />
-            <ButtonArea currentNameStyle={this.state.currentNameStyle} readyToGenerate={this.state.dataReady} blockMode={this.state.blockMode} simpleMode={this.state.simpleMode} rejectedMode={this.state.rejectedMode} onChangeStyle={this.handleChangeStyle} onChangeMode={this.handleChangeMode} onClickGenerate={this.handleClickGenerate} />
+            <ButtonArea 
+              currentNameStyle={this.state.currentNameStyle} 
+              readyToGenerate={this.state.dataReady} 
+              blockMode={this.state.blockMode} 
+              simpleMode={this.state.simpleMode} 
+              rejectedMode={this.state.rejectedMode} 
+              onChangeStyle={this.handleChangeStyle} 
+              onChangeMode={this.handleChangeMode} 
+              onClickGenerate={this.handleClickGenerate}
+              syllablePattern={namePatterns[this.state.currentNameStyle]}
+            />
             <TitleBar userLoggedIn={this.state.userLoggedIn} titleText={this.state.titleText} statusText={this.state.statusText} totalCalls={this.generator.totalCalls} uniqueGenerated={this.state.productionData.namesList.length} />
           </div>
         )}

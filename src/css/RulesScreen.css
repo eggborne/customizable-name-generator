@@ -1,5 +1,4 @@
 #rules-screen {
-  /* padding: 2vmin; */
   position: absolute;
   top: 0;
   left: 0;
@@ -7,8 +6,6 @@
   height: 100%;
   background-color: black;
   display: flex;
-  /* opacity: 0; */
-  /* transform: scaleX(1.1); */
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
@@ -96,9 +93,10 @@ a {
   height: 3.5rem;
 }
 #rules-screen .title-header {
+  position: relative;
   height: 11vh;
-  padding-left: var(--list-padding);
-  padding-right: var(--list-padding);
+  /* padding-left: var(--list-padding);
+  padding-right: var(--list-padding); */
   display: grid;
   grid-template-columns: min-content 1fr;
   grid-template-rows: 1fr;

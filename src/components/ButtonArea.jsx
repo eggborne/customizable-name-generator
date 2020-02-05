@@ -1,15 +1,22 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Route, Link } from "react-router-dom";
 import Button from './Button.jsx';
+import PatternDisplay from './PatternDisplay.jsx';
 
 // import '../css/ButtonArea.css';
 
+const units = {
+  onsets: 'C',
+  nuclei: 'V',
+  codas: 'C'
+}
+
 function ButtonArea(props) {
-  // console.error('rendering ButtonArea!!', props.readyToGenerate)
-  return (    
+  return (
     <div id='main-container'>
+      <div id='pattern-label'>Pattern</div>
       <div id='style-select-area'>
-        <div id='style-label'>Pattern</div>
+        <PatternDisplay syllablePattern={props.syllablePattern} />
         <div>
           <Button onClick={props.onChangeStyle} label={'Random'} type='random' className='style-toggle-button' selected={props.currentNameStyle === 'random'} />
           <Button onClick={props.onChangeStyle} label={'Custom...'} type='custom' className='style-toggle-button' selected={props.currentNameStyle === 'custom'} />
@@ -25,7 +32,7 @@ function ButtonArea(props) {
         {/* <Button onClick={props.onChangeStyle} label={'Lando'} type='lando' className='style-toggle-button' selected={props.currentNameStyle === 'lando'} /> */}
       </div>
       <div id='mode-button-area'>
-      {/* <div id='mode-label'>Mode</div> */}
+        {/* <div id='mode-label'>Mode</div> */}
         <Button onClick={props.onChangeMode} label={'Block NSFW:'} type='block-vulgar-toggle' className='mode-toggle-button' selected={props.blockMode} />
         {/* <Button onClick={props.onChangeMode} label={'Bulk Mode:'} type='bulk-toggle' className='mode-toggle-button' selected={props.bulkMode} /> */}
         <Button onClick={props.onChangeMode} label={'Simple Mode:'} type='simple-toggle' className='mode-toggle-button' selected={props.simpleMode} />
@@ -35,14 +42,20 @@ function ButtonArea(props) {
         <Button onClick={props.onClickGenerate} unavailable={!props.readyToGenerate} label={'GENERATE'} type='main' />
       </div>
       <div id='link-button-area'>
-        <Link to="/history" replace><Button onClick={() => null} className={'nav-link'} label={'HISTORY'} type='history' /></Link>
-        <Link to="/rules" replace><Button onClick={() => null} className={'nav-link'} label={'RULES'} type='rules' /></Link>
+        <Link to='/history' replace>
+          <Button onClick={() => null} className={'nav-link'} label={'HISTORY'} type='history' />
+        </Link>
+        <Link to='/rules' replace>
+          <Button onClick={() => null} className={'nav-link'} label={'RULES'} type='rules' />
+        </Link>
       </div>
     </div>
   );
 }
 const isEqual = (prevProps, nextProps) => {
-  let isEqual = prevProps.currentNameStyle == nextProps.currentNameStyle &&
+    console.warn('rendering ButtonArea!!', nextProps.syllablePattern);
+
+  let isEqual = prevProps.currentNameStyle === nextProps.currentNameStyle &&
     prevProps.blockMode === nextProps.blockMode &&
     // prevProps.bulkMode === nextProps.bulkMode &&
     prevProps.simpleMode === nextProps.simpleMode &&

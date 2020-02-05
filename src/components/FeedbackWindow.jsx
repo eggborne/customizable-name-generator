@@ -51,7 +51,6 @@ function FeedbackWindow(props) {
   let article = '';
   let longestWord = 0;
   if (props.showing === 'editName') {
-    console.warn('showineditNamegNAme!!')
     if (props.nameData && props.nameData.wordUnits) {
       names = [];
       for (let wordType in props.nameData.wordUnits) {
@@ -65,6 +64,9 @@ function FeedbackWindow(props) {
     requestAnimationFrame(() => {
       [...document.querySelectorAll('.name-letter')].map(letterEl => {
         let width = (window.innerWidth * 0.68) / longestWord;
+        if (width > (window.innerHeight / 12)) {
+          width = window.innerHeight / 12;
+        }
         let fontSize = width * 0.75;
         letterEl.style.fontSize = fontSize + 'px';
         letterEl.style.width = width + 'px';
